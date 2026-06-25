@@ -1509,3 +1509,16 @@ select.fctrl { cursor: pointer; }
   transition: all 0.2s;
 }
 .btn-clear-favs:hover { background: #fee2e2; border-color: #fca5a5; }
+
+@media (max-width: 768px) {
+  #favoritesModal .m-body {
+    grid-template-columns: 1fr !important; /* 1 column on mobile */
+    padding: 16px !important;
+  }
+  #favoritesModal.modal-overlay {
+    padding: 0; /* Remove padding for full-screen modal */
+  }
+}
+/* ==========================================================================
+   ── ✅ Status Badge — ใช้ใน notification/tracking modal
+   ========================================================================== */
