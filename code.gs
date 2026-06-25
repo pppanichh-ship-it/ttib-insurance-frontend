@@ -317,16 +317,6 @@ function handleAddPackage(payload) {
 // ACTION 3: updateStatus
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ACTION 3: updateStatus
-// [FIX-CRITICAL] เดิมเมื่อสถานะเข้าเงื่อนไข STATUS_ARCHIVE_MAP (ปิดการขาย/ยกเลิก/ไม่สนใจ)
-//                จะ archive แถวไปชีตอื่นแล้ว deleteRow ออกจาก SALES ทันที
-//                แต่ adminLeadsData (handleGetLeads) อ่านจาก SALES เท่านั้น
-//                ทำให้ลูกค้าหายจาก Closed Modal / Renewal Modal / History Modal
-//                ทันทีที่กด "รีเฟรชข้อมูล" → ตัดการ archive ออก คงทุกแถวไว้ใน SALES
-//                เพื่อให้ฝั่ง frontend (ซึ่งอ่านจากชีตเดียวเสมอ) ใช้งานได้ถูกต้อง
-// ─────────────────────────────────────────────────────────────────────────────
-
 function handleUpdateStatus(payload) {
   var newStatus = String(payload.status || payload.newStatus || "").trim();
   var rowIndex  = parseInt(payload.rowIndex, 10);
@@ -351,9 +341,9 @@ function handleUpdateStatus(payload) {
 
   SpreadsheetApp.flush();
 
-  // [FIX-CRITICAL] ไม่ archive/deleteRow อีกต่อไป — แถวคงอยู่ใน SALES เสมอ
-  // เพื่อให้ adminLeadsData (ที่อ้างอิง rowIdx ตรงกับแถวจริงใน SALES) ถูกต้องตลอดเวลา
-  // และทุก modal (Closed/Renewal/History/Dashboard) เห็นข้อมูลครบหลัง refresh
+  // [CRITICAL FIX] Do not archive/delete the row anymore.
+  // The row must remain in the SALES sheet to ensure data consistency for the admin panel,
+  // which reads exclusively from this sheet. All filtering is now handled on the client-side.
 
   Logger.log("updateStatus: row " + rowIndex + " → " + newStatus);
   return { status: "ok", action: "updateStatus", newStatus: newStatus };
