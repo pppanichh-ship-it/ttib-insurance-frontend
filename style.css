@@ -1528,6 +1528,44 @@ select.fctrl { cursor: pointer; }
     padding: 0; /* Remove padding for full-screen modal */
   }
 }
+
+/* ==========================================================================
+   ── [NEW] Mobile Responsiveness for Tinder Card Detail
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* When a plan detail is active, make its container a full-screen overlay */
+  body.plan-detail-is-active .plan-container.is-active {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    margin: 0;
+  }
+
+  /* Ensure the hover/detail area fills the new fixed container */
+  body.plan-detail-is-active .plan-container.is-active .plan-detail-hover {
+    inset: 0;
+    padding: 0;
+  }
+
+  /* Adjust the card itself for full-screen view */
+  body.plan-detail-is-active .plan-container.is-active .tinder-card {
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    transform: none !important; /* Override hover transform */
+  }
+
+  /* Reposition navigation buttons for mobile */
+  body.plan-detail-is-active .plan-container.is-active .tinder-nav {
+    top: auto;
+    bottom: 20px; /* Place at the bottom */
+    left: 20px;
+    right: 20px;
+    transform: none;
+  }
+}
 /* ==========================================================================
    ── ✅ Status Badge — ใช้ใน notification/tracking modal
    ========================================================================== */
