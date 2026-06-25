@@ -1083,28 +1083,28 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
         </label>
         <div class="summary-header">
           <div class="summary-logo">
-            ${cLogo ? `<img src="${cLogo}" alt="${escapeHtml(plan.company)}">` : `<span>${escapeHtml(plan.company)}</span>`}
+            ${cLogo ? `<img src="${cLogo}" alt="${escapeHtml(plan.company)}" style="width:100%; height:100%; object-fit:contain;">` : `<span>${escapeHtml(plan.company)}</span>`}
           </div>
           <div class="summary-title">
              <div class="summary-company-name">${escapeHtml(plan.company)}</div>
             <div class="plan-name">${escapeHtml(plan.plan)}</div>
-            <div class="cov-type-name" style="font-size:12px; color:var(--accent); font-weight:700; margin-top:2px;">${escapeHtml(plan.covType || 'Package')}</div>
+            <div class="cov-type-name" style="font-size:11px; color:var(--accent); font-weight:700; margin-top:2px;">${escapeHtml(plan.covType || 'Package')}</div>
             ${plan.group ? `<div class="group-name">${escapeHtml(plan.group)}</div>` : ''}
           </div>
         </div>
         <div class="stat-block summary-footer">
-          <div class="stat-item"><div class="stat-label">ทุนประกัน</div><div class="stat-value sum-insured-value" data-value="${sumInsured}">${fmt(sumInsured)}<span class="unit">บาท</span></div></div>
-          <div class="stat-item"><div class="stat-label">เบี้ยเริ่มต้น</div><div class="stat-value premium-value-main" data-value="${price}">${price > 0 ? `${fmt(price)}<span class="unit">บาท</span>` : 'ติดต่อเจ้าหน้าที่'}</div></div>
+          <div class="stat-item"><div class="stat-label">ทุนประกัน</div><div class="stat-value sum-insured-value" data-value="${sumInsured}">${fmt(sumInsured)}<span class="unit"> บาท</span></div></div>
+          <div class="stat-item"><div class="stat-label">เบี้ยเริ่มต้น</div><div class="stat-value premium-value-main" data-value="${price}">${price > 0 ? `${fmt(price)}<span class="unit"> บาท</span>` : 'ติดต่อเจ้าหน้าที่'}</div></div>
         </div>
-          <button type="button" class="btn-h" style="margin-top:10px;" onclick="event.stopPropagation(); goToUserForm('${escapeHtml(plan.company)}', '${escapeHtml(plan.plan)}', '${escapeHtml(plan.group)}')">
+          <button type="button" class="btn-h" style="margin-top:12px; height:42px; font-size:14px; border-radius:12px;" onclick="event.stopPropagation(); goToUserForm('${escapeHtml(plan.company)}', '${escapeHtml(plan.plan)}', '${escapeHtml(plan.group)}')">
             <i class="ti ti-phone-call"></i>
             <span>สนใจทำประกันภัย</span>
           </button>
       </article>
       <div class="plan-detail-hover">
         <div class="tinder-nav">
-          <button class="tinder-nav-btn tinder-btn-prev" onclick="moveCompanyCard('${compEscaped}',-1)" ${curIdx === 0 ? 'disabled' : ''}>&#8249;</button>
-          <button class="tinder-nav-btn tinder-btn-next" onclick="moveCompanyCard('${compEscaped}',1)" ${curIdx === groupLength - 1 ? 'disabled' : ''}>&#8250;</button>
+          <button class="tinder-nav-btn tinder-btn-prev" onclick="moveCompanyCard('${compEscaped}',-1, event)" ${curIdx === 0 ? 'disabled' : ''}>&#8249;</button>
+          <button class="tinder-nav-btn tinder-btn-next" onclick="moveCompanyCard('${compEscaped}',1, event)" ${curIdx === groupLength - 1 ? 'disabled' : ''}>&#8250;</button>
         </div>
         <div class="tinder-card">
           <button class="detail-close-btn" onclick="togglePlanDetail(this, false)" title="ปิด"><i class="ti ti-x"></i></button>
@@ -1153,8 +1153,8 @@ function togglePlanDetail(el, forceShow) {
   }
 }
 
-function moveCompanyCard(company, direction) {
-  event.stopPropagation(); // ป้องกันไม่ให้ event bubble ไปยัง parent และปิด detail view
+function moveCompanyCard(company, direction, event) {
+  if (event) event.stopPropagation(); // ป้องกันไม่ให้ event bubble ไปยัง parent และปิด detail view
   const companyGroups = {};
   window.currentPlans.forEach((plan, idx) => {
     const compKey = plan.company ? String(plan.company).trim().toUpperCase() : 'UNKNOWN';
