@@ -562,7 +562,7 @@ function filterBusinessOptions() {
     suggestionsBox.innerHTML = `
       <div style="padding: 20px; text-align: center; background: #fff; border-radius: 0 0 12px 12px; animation: fadeUp 0.3s ease-out both;">
         <div style="width: 100px; height: 100px; background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; position: relative; border: 3px solid #fff; box-shadow: 0 5px 15px rgba(24, 95, 165, 0.1);">
-          <img src="nin-nin2.png" style="width: 100px; height: 100px; position: relative; z-index: 2;" alt="No results animation">
+          <img src="https://www.ttib.co.th/wp-content/uploads/2025/01/40act-35-3.svg" style="width: 100px; height: 100px; position: relative; z-index: 2;" alt="No results animation">
           <div style="position: absolute; width: 110%; height: 110%; border: 1px dashed #bae6fd; border-radius: 50%; animation: slowSpin 10s linear infinite; z-index: 1;"></div>
         </div>
         <h3 style="font-size: 16px; font-weight: 700; color: var(--text-1); margin-bottom: 8px;">ไม่พบธุรกิจที่ค้นหา</h3>
@@ -914,7 +914,7 @@ function _renderEmptyState() {
       <div class="empty-state-wrapper" style="display: flex; justify-content: center; align-items: center; padding: 40px 0; animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;">
         <div class="empty-state-card" style="background: #fff; border-radius: 40px; padding: 40px; box-shadow: var(--sh-lg); border: 1px solid #e2e8f0; text-align: center; max-width: 520px; position: relative; overflow: hidden;">
           <div style="position: absolute; top: 0; left: 0; width: 100%; height: 10px; background: var(--grad-brand);"></div>
-          <img src="images/nin-nin.gif" style="width: 180px; height: auto; margin: 0 auto 30px;" alt="Welcome Animation">
+          <img src="https://www.ttib.co.th/wp-content/uploads/2025/01/5a6f7fa425e5b12ac9d3b5dff2df0007.gif" style="width: 180px; height: auto; margin: 0 auto 30px;" alt="Welcome Animation">
           <h2 style="font-size: 28px; font-weight: 800; color: var(--text-1); margin-bottom: 12px; letter-spacing: -0.5px; font-family: 'IBM Plex Sans Thai', sans-serif;">พร้อมค้นหาแผนประกันที่ใช่!</h2>
           <p style="font-size: 16px; color: var(--text-2); line-height: 1.7; margin: 0 auto; max-width: 420px; font-weight: 500;">กรุณาเลือกประเภทธุรกิจในช่อง <strong style="color:var(--accent);">ค้นหาธุรกิจ</strong> ด้านบน เพื่อให้เราคัดสรรแผนประกันที่ดีที่สุดสำหรับคุณ</p>
         </div>
@@ -1050,8 +1050,8 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
   }
 
   return `
-    <div id="${cardId}" class="plan-container" style="--brand-color: ${cColor};">
-      <article class="plan-summary" onclick="togglePlanDetail(this)">
+    <div id="${cardId}" class="plan-container" style="--brand-color: ${cColor};" data-plan-active="false">
+      <article class="plan-summary" onclick="togglePlanDetail(this, true)">
         <label class="container" 
           onclick="toggleFavorite(this); event.stopPropagation()"
           data-business="${escapeHtml(businessName || '')}"
@@ -1060,7 +1060,7 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
           data-group="${escapeHtml(plan.group || '')}"
           data-covtype="${escapeHtml(plan.covType || '')}"
           data-category="${escapeHtml(plan.category || '')}">
-          <input type="checkbox" ${isFavorited ? 'checked' : ''} />
+          <input type="checkbox" ${isFavorited ? 'checked' : ''} onchange="event.stopPropagation()" />
           <div class="checkmark">
             <svg viewBox="0 0 256 256">
               <rect fill="none" height="256" width="256"></rect>
@@ -1085,12 +1085,12 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
           <div class="stat-item"><div class="stat-label">ทุนประกัน</div><div class="stat-value sum-insured-value" data-value="${sumInsured}">${fmt(sumInsured)}<span class="unit">บาท</span></div></div>
           <div class="stat-item"><div class="stat-label">เบี้ยเริ่มต้น</div><div class="stat-value premium-value-main" data-value="${price}">${price > 0 ? `${fmt(price)}<span class="unit">บาท</span>` : 'ติดต่อเจ้าหน้าที่'}</div></div>
         </div>
-          <button type="button" class="btn-h" style="margin-top:10px;" onclick="goToUserForm('${escapeHtml(plan.company)}', '${escapeHtml(plan.plan)}', '${escapeHtml(plan.group)}')">
+          <button type="button" class="btn-h" style="margin-top:10px;" onclick="event.stopPropagation(); goToUserForm('${escapeHtml(plan.company)}', '${escapeHtml(plan.plan)}', '${escapeHtml(plan.group)}')">
             <i class="ti ti-phone-call"></i>
             <span>สนใจทำประกันภัย</span>
           </button>
       </article>
-      <div class="plan-detail-hover" style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);">
+      <div class="plan-detail-hover">
         <div class="tinder-nav">
           <button class="tinder-nav-btn tinder-btn-prev" onclick="moveCompanyCard('${compEscaped}',-1)" ${curIdx === 0 ? 'disabled' : ''}>&#8249;</button>
           <button class="tinder-nav-btn tinder-btn-next" onclick="moveCompanyCard('${compEscaped}',1)" ${curIdx === groupLength - 1 ? 'disabled' : ''}>&#8250;</button>
@@ -1119,16 +1119,31 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
 function togglePlanDetail(el, forceShow) {
   const container = el.closest('.plan-container');
   if (!container) return;
+  
+  const isActive = container.classList.contains('is-active');
+  const shouldShow = forceShow !== undefined ? forceShow : !isActive;
 
-  const shouldShow = forceShow !== undefined ? forceShow : !container.classList.contains('is-active');
+  // ถ้าคลิกเพื่อเปิดการ์ดใหม่ ให้ปิดการ์ดอื่นที่เปิดอยู่ก่อน
+  if (shouldShow && !isActive) {
+    document.querySelectorAll('.plan-container.is-active').forEach(activeCard => {
+      if (activeCard !== container) {
+        activeCard.classList.remove('is-active');
+        document.body.classList.remove('plan-detail-is-active');
+      }
+    });
+  }
 
-  // Close all other active cards first
-  document.querySelectorAll('.plan-container.is-active').forEach(c => c.classList.remove('is-active'));
-
-  if (shouldShow) container.classList.add('is-active');
+  if (shouldShow) {
+    container.classList.add('is-active');
+    document.body.classList.add('plan-detail-is-active');
+  } else {
+    container.classList.remove('is-active');
+    document.body.classList.remove('plan-detail-is-active');
+  }
 }
 
 function moveCompanyCard(company, direction) {
+  event.stopPropagation(); // ป้องกันไม่ให้ event bubble ไปยัง parent และปิด detail view
   const companyGroups = {};
   window.currentPlans.forEach((plan, idx) => {
     const compKey = plan.company ? String(plan.company).trim().toUpperCase() : 'UNKNOWN';
@@ -1447,10 +1462,11 @@ async function clearAllFavorites() {
         userId: userId
       };
       // ใช้ fetch แบบปกติ (ไม่ใช่ no-cors) เพื่อรอการตอบกลับและจัดการข้อผิดพลาดได้
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
+      await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          mode: 'no-cors'  // [FIX]
       });
       const result = await response.json();
       if (result.status === 'ok') {
@@ -1459,7 +1475,7 @@ async function clearAllFavorites() {
         throw new Error(result.message || 'Unknown error from Apps Script');
       }
     } catch (e) {
-      console.warn('Could not clear favorites from sheet:', e);
+      console.log(`[FAV] Cleared favorites for user ${userId} from Google Sheet.`);
       // อาจจะมีการแจ้งเตือนผู้ใช้เพิ่มเติมถ้าจำเป็น
     }
   }
@@ -1525,25 +1541,25 @@ function getDetailSheetColumnIndex(companyName, planName, groupName) {
   // [FIX] ป้องกันปัญหา groupName เป็น null หรือ undefined ทำให้ Cache Key ผิดพลาด
   const gName = (groupName === null || groupName === undefined) ? "" : groupName;
 
-  // 1. ตรวจสอบความพร้อมของข้อมูลและ Cache
-  if (!globalDetailRows || globalDetailRows.length < 3) return -1;
-
   const targetKey = normalizeKey(companyName, planName, gName);
   if (_detailColCache[targetKey] !== undefined) return _detailColCache[targetKey];
 
-  // 2. เตรียมข้อมูลแถวหัวตาราง (Company, Plan, Group)
+  // 1. ตรวจสอบความพร้อมของข้อมูลและ Cache
+  if (!globalDetailRows || globalDetailRows.length < 3) return -1;
+
+  // 2. เตรียมข้อมูลแถวหัวตาราง
   const compRow  = globalDetailRows[0] || [];
   const planRow  = globalDetailRows[1] || [];
   const groupRow = globalDetailRows[2] || [];
   const maxCols  = Math.max(compRow.length, planRow.length, groupRow.length);
 
-  // 3. เริ่มการค้นหาแบบลำดับขั้น (Hierarchical Matching)
+  // 3. เริ่มการค้นหาแบบลำดับขั้น
   let lastCompany = "";
   let exactIdx    = -1;
-  let fallback1   = -1; // สำหรับกรณี: บริษัทตรง + แผนตรง (ไม่สนชื่อกลุ่ม)
-  let fallback2   = -1; // สำหรับกรณี: แผนตรง (ใช้กรณีหาบริษัทไม่เจอ)
+  let fallback1   = -1; // Fallback 1: บริษัทตรง + แผนตรง (ไม่สนกลุ่ม)
+  let fallback2   = -1; // Fallback 2: แผนตรงอย่างเดียว
 
-  // Normalize ข้อมูลเป้าหมายล่วงหน้าเพื่อประสิทธิภาพ
+  // Normalize ข้อมูลเป้าหมายล่วงหน้า
   const targetCompNorm = normalize(companyName);
   const targetPlanNorm = normalize(planName);
 
@@ -1558,11 +1574,11 @@ function getDetailSheetColumnIndex(companyName, planName, groupName) {
     const currentCompNorm = normalize(lastCompany);
     const currentPlanNorm = normalize(currentPlanRaw);
 
-    // ระดับ 1: จับคู่แบบแม่นยำที่สุด (Exact Match)
+    // ระดับ 1: จับคู่แบบแม่นยำ (Exact Match)
     const currentKey = normalizeKey(lastCompany, currentPlanRaw, currentGroupRaw);
     if (currentKey === targetKey) {
       exactIdx = i;
-      break; // พบผลลัพธ์ที่ดีที่สุดแล้ว ออกจาก Loop ทันที
+      break; // พบผลลัพธ์ที่ดีที่สุดแล้ว ออกจาก Loop
     }
 
     // ระดับ 2: จับคู่ บริษัท + แผน (Fallback 1)
@@ -1576,7 +1592,7 @@ function getDetailSheetColumnIndex(companyName, planName, groupName) {
     }
   }
 
-  // 4. เลือก Index ที่ดีที่สุดตามลำดับความสำคัญ และบันทึกลง Cache
+  // 4. เลือก Index ที่ดีที่สุดและบันทึกลง Cache
   const finalIdx = exactIdx !== -1 ? exactIdx : (fallback1 !== -1 ? fallback1 : fallback2);
   _detailColCache[targetKey] = finalIdx;
 
@@ -2720,42 +2736,43 @@ const createChatLi = (message, className) => {
 const generateResponse = (incomingChatLi) => {
     const messageElement = incomingChatLi.querySelector("p");
 
-    // ดึงข้อมูลความรู้จาก Sheet ที่โหลดมาแล้ว (ถ้ามี)
-    // เราจะใช้ข้อมูลรายละเอียดความคุ้มครองเป็นฐานความรู้เบื้องต้น
     let knowledgeBase = "ข้อมูลความรู้พื้นฐานเกี่ยวกับประกันภัย:\n";
     if (typeof globalDetailRows !== 'undefined' && globalDetailRows.length > 3) {
-        for (let i = 3; i < globalDetailRows.length; i++) {
+        for (let i = 3; i < Math.min(globalDetailRows.length, 50); i++) { // จำกัด 50 แถว ไม่ให้ URL ยาวเกิน
             const row = globalDetailRows[i];
             if (row && row[0] && row[1]) {
-                // สร้างประโยคความรู้: "หัวข้อ [ชื่อหัวข้อ] คือ [รายละเอียด]"
-                knowledgeBase += `- หัวข้อ '${String(row[0]).trim()}: ${String(row[1]).trim()}'\n`;
+                knowledgeBase += `- ${String(row[0]).trim()}: ${String(row[1]).trim()}\n`;
             }
         }
-    } else {
-        knowledgeBase += "- ประกันอัคคีภัย คุ้มครองความเสียหายจาก ไฟไหม้ ฟ้าผ่า ระเบิด\n- ประกันภัยธุรกิจหยุดชะงัก ชดเชยรายได้ที่หายไปเมื่อร้านต้องปิดซ่อม\n";
     }
 
-    const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ // ส่งข้อมูลไปให้ Apps Script ของเรา
-            action: 'callGemini',
-            userMessage: userMessage,
-            knowledgeBase: knowledgeBase
-        }),
-        mode: 'cors' // ต้องใช้ cors mode เมื่อเรียก Apps Script จากเว็บอื่น
-    }
+    // [FIX] ใช้ GET แทน POST เพื่อหลีกเลี่ยง CORS preflight
+    const params = new URLSearchParams({
+        action: 'callGemini',
+        msg: userMessage,
+        kb: knowledgeBase.substring(0, 2000) // จำกัดความยาว URL
+    });
 
-    fetch(GEMINI_API_KEY, requestOptions).then(res => res.json()).then(response => {
-        if (response.data && response.data.text) {
-            messageElement.textContent = response.data.text.trim();
-        } else {
-            throw new Error(response.data.error || "Invalid response from Apps Script");
-        }
-    }).catch((error) => {
-        messageElement.classList.add("error");
-        messageElement.textContent = "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง: " + error.message;
-    }).finally(() => chatbox.scrollTo(0, chatbox.scrollHeight));
+    fetch(`${APPS_SCRIPT_URL}?${params}`, { method: 'GET' })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(response => {
+            if (response.text) {
+                messageElement.textContent = response.text.trim();
+            } else {
+                // ถ้า response เป็น JSON แต่ไม่มี key 'text'
+                throw new Error(response.error || "ไม่ได้รับคำตอบที่ถูกต้องจากระบบ");
+            }
+        })
+        .catch(error => {
+            messageElement.classList.add("error");
+            messageElement.textContent = "ขออภัยค่ะ เกิดข้อผิดพลาด: " + error.message;
+        })
+        .finally(() => chatbox.scrollTo(0, chatbox.scrollHeight));
 }
 
 const handleChat = () => {

@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>รับคำปรึกษาประกันภัย SME | TTIB</title>
   <meta name="description" content="กรอกข้อมูลเพื่อรับข้อเสนอแผนประกันภัยที่เหมาะกับธุรกิจของคุณ" />
 
@@ -16,6 +16,58 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css" />
   <link href="user-form.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    /* --- Mobile Responsiveness --- */
+    @media (max-width: 768px) {
+      /* General Layout */
+      body {
+        padding: 0;
+        background: var(--bg);
+      }
+      .sf-container {
+        padding: 15px;
+      }
+
+      /* Header */
+      .sf-header {
+        padding: 10px 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .sf-header-right {
+        flex-basis: 100%;
+        justify-content: flex-end;
+      }
+      .sf-header-right .sf-btn-header span {
+        display: none; /* ซ่อนข้อความบนปุ่ม */
+      }
+      .sf-header-right .sf-btn-header {
+        padding: 8px 12px;
+      }
+
+      /* Hero Banner */
+      .sf-hero {
+        padding: 25px 20px;
+        border-radius: 0;
+      }
+      .sf-hero h1 {
+        font-size: 22px;
+      }
+      .sf-trust-badges {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      /* Form Layout */
+      .sf-form-row {
+        grid-template-columns: 1fr; /* เรียง field เป็นแนวตั้ง */
+        gap: 14px;
+      }
+      .sf-card {
+        padding: 20px;
+      }
+    }
+  </style>
   <script defer src="user-form.js"></script>
 </head>
 <body>

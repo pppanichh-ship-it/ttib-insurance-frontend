@@ -1324,39 +1324,36 @@ async function sfSubmit() {
 
   let submitted = false;
 
-  if (appsScriptUrl) {
-    for (let attempt = 1; attempt <= 2; attempt++) {
-      try {
-        const ctrl = new AbortController();
-        const tid  = setTimeout(() => ctrl.abort(), 12000);
-        const resp = await fetch(appsScriptUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'submitContact', rowData: rowDataArray, photoData: null }),
-          signal: ctrl.signal,
-        });
-        clearTimeout(tid);
-        
-        if (!resp.ok) {
-          throw new Error(`HTTP Error: ${resp.status}`);
+    if (appsScriptUrl) {
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          const ctrl = new AbortController();
+          const tid  = setTimeout(() => ctrl.abort(), 12000);
+
+          // [FIX] no-cors + text/plain — ไม่ trigger CORS preflight
+          await fetch(appsScriptUrl, {
+            method:  'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body:    JSON.stringify({ action: 'submitContact', rowData: rowDataArray }),
+            mode:    'no-cors',
+            signal:  ctrl.signal,
+          });
+          clearTimeout(tid);
+
+          // [FIX] no-cors response เป็น opaque อ่านไม่ได้
+          // Network ไม่ error = GAS รับ request แล้ว → ถือว่าสำเร็จ
+          submitted = true;
+          break;
+
+        } catch (err) {
+          clearTimeout && clearTimeout(); // cleanup ถ้า abort
+          console.warn(`[TTIB Form] Attempt ${attempt} failed:`, err.message);
+          if (attempt < 2) await new Promise(r => setTimeout(r, 1500));
         }
-        
-        const result = await resp.json();
-        if (result.status === 'error') {
-          throw new Error(`Apps Script Error: ${result.message}`);
-        }
-        
-        submitted = true;
-        break;
-      } catch (err) {
-        console.warn(`[TTIB Form] Attempt ${attempt} failed:`, err.message);
-        if (attempt < 2) await new Promise(r => setTimeout(r, 1500));
       }
+    } else {
+      submitted = true; // ไม่มี URL → ผ่าน sessionStorage อย่างเดียว
     }
-  } else {
-    // ไม่มี URL — ถือว่าบันทึกสำเร็จผ่าน sessionStorage
-    submitted = true;
-  }
 
   // ── แสดงผล + Redirect ────────────────────────────────────────────────────
   if (submitted) {
@@ -1431,7 +1428,7 @@ function sfShowSuccessScreen() {
 function sfReturnAndAction(type) {
   if (type === 'compare') sessionStorage.setItem('pendingComparison', 'true');
   
-  const redirectUrl = 'user.html?from_form=true';
+  const redirectUrl = 'index.html?from_form=true';
   window.location.href = redirectUrl;
 }
 // =============================================================================
@@ -1489,7 +1486,7 @@ function openShareInquiryModal() {
     address: data.address || "-"
   };
 
-  const baseUrl = window.location.origin + window.location.pathname.replace('user-form.html', 'user.html');
+  const baseUrl = window.location.origin + window.location.pathname.replace('user-form.html', 'index.html');
   const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(quote))));
   const webLink = `${baseUrl}?quote=${encodedData}`;
 
