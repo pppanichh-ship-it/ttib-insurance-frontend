@@ -178,6 +178,7 @@ const sfState = {
   // ข้อมูลทรัพย์สิน
   insuredStatus: '',
   area:        '',
+  photoData:   null, // [NEW] เพิ่ม state สำหรับเก็บข้อมูลรูปภาพ
   stock:       '',
   equipment:   '',
   renovation:  '',
@@ -1270,6 +1271,7 @@ async function sfSubmit() {
   const formPayload = {
     rowData: rowDataArray,
     structured: {
+      photoData:     sfState.photoData, // [NEW] เพิ่ม photoData
       bizName:       bizText,
       covType:       sfState.covType,
       sumInsured:    sfState.sumInsured,
@@ -1334,7 +1336,7 @@ async function sfSubmit() {
           await fetch(appsScriptUrl, {
             method:  'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body:    JSON.stringify({ action: 'submitContact', rowData: rowDataArray }),
+            body:    JSON.stringify({ action: 'submitContact', rowData: rowDataArray, photoData: sfState.photoData }), // [NEW] ส่ง photoData
             mode:    'no-cors',
             signal:  ctrl.signal,
           });
@@ -1594,6 +1596,73 @@ document.addEventListener('DOMContentLoaded', async () => { // ทำให้ e
 
   console.log('[TTIB Form] Standalone form initialized');
   console.log('[TTIB Form] Source:',   sfState.source   || '(ไม่ระบุ)');
+});
+
+// [NEW] เพิ่มฟังก์ชันจัดการการอัปโหลดรูปภาพทั้งหมด
+document.addEventListener('DOMContentLoaded', () => {
+  const uploadArea = document.getElementById('sf-photo-upload-area');
+  const fileInput = document.getElementById('sf-photo-input');
+  const promptEl = document.getElementById('sf-photo-prompt');
+  const previewWrapper = document.getElementById('sf-photo-preview-wrapper');
+  const previewImg = document.getElementById('sf-photo-preview');
+  const clearBtn = document.getElementById('sf-photo-clear-btn');
+
+  if (!uploadArea || !fileInput || !promptEl || !previewWrapper || !previewImg || !clearBtn) return;
+
+  const handleFile = (file) => {
+    if (!file || !file.type.startsWith('image/')) {
+      sfShowError('err-photo', true, 'กรุณาเลือกไฟล์รูปภาพเท่านั้น');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      sfShowError('err-photo', true, 'ขนาดรูปภาพต้องไม่เกิน 5MB');
+      return;
+    }
+
+    sfShowError('err-photo', false);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      sfState.photoData = e.target.result;
+      previewImg.src = e.target.result;
+      promptEl.style.display = 'none';
+      previewWrapper.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearFile = () => {
+    sfState.photoData = null;
+    fileInput.value = ''; // Clear the file input
+    promptEl.style.display = 'block';
+    previewWrapper.style.display = 'none';
+    previewImg.src = '';
+    sfShowError('err-photo', false);
+  };
+
+  uploadArea.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+  clearBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent triggering the upload area click
+    clearFile();
+  });
+
+  // Drag and Drop events
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    }, false);
+  });
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+  });
+
+  uploadArea.addEventListener('drop', (e) => handleFile(e.dataTransfer.files[0]), false);
 });
 
 // =============================================================================

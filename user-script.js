@@ -327,7 +327,10 @@ async function handleInterestClick(data) {
   // ในที่นี้เลือกเปิด LINE พร้อมข้อความอัตโนมัติ
   window.open(`https://line.me/R/msg/text/?${encodedMsg}`, '_blank');
 
-  alert('ขอบคุณที่ให้ความสนใจ! ระบบได้ส่งข้อมูลความสนใจของท่านให้เจ้าหน้าที่แล้ว และกำลังนำท่านไปยังช่องทางแชทเพื่อสอบถามเพิ่มเติมครับ');
+  // [SUGGESTION] เปลี่ยนจาก alert เป็น Toast Notification เพื่อ UX ที่ดีขึ้น
+  // alert('ขอบคุณที่ให้ความสนใจ! ระบบได้ส่งข้อมูลความสนใจของท่านให้เจ้าหน้าที่แล้ว และกำลังนำท่านไปยังช่องทางแชทเพื่อสอบถามเพิ่มเติมครับ');
+  showUserToast('แจ้งความสนใจสำเร็จ! กำลังนำท่านไปยังแอปพลิเคชัน LINE', 'success');
+
   
   btns.forEach(btn => {
     btn.style.background = '#059669';
@@ -2455,6 +2458,23 @@ function exportComparisonPDF(providedCards, passedLeadData = null) {
     }
     .logo-footer-fixed { position: fixed; bottom: 8mm; left: 10mm; z-index: 9999; display: none; }
     @media print { .logo-footer-fixed { display: block !important; } }
+  </style>
+  <style>
+    /* [NEW] Mobile Responsiveness for PDF Preview */
+    @media screen and (max-width: 768px) {
+      body { padding: 10px; }
+      .doc-header { flex-direction: column; align-items: flex-start; gap: 15px; padding: 20px; }
+      .doc-header-right { text-align: left; }
+      .doc-title { font-size: 20px; }
+      .info-summary-grid { padding: 15px; }
+      .btn-print-fixed {
+        bottom: 15px; right: 15px;
+        padding: 12px 20px;
+        font-size: 13px;
+        width: calc(100% - 30px);
+        justify-content: center;
+      }
+    }
   </style>
 </head>
 <body>

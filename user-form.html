@@ -66,6 +66,12 @@
       .sf-card {
         padding: 20px;
       }
+
+      /* [NEW] Photo upload area dragover effect */
+      #sf-photo-upload-area.dragover {
+        border-color: var(--brand);
+        background: var(--brand-light);
+      }
     }
   </style>
   <script defer src="user-form.js"></script>
@@ -307,6 +313,7 @@
         <div class="sf-inp-error-msg" id="err-email"></div>
       </div>
 
+
       <div class="sf-form-group">
         <label class="sf-lbl" for="sf-time">ช่วงเวลาที่สะดวก <span class="sf-req">*</span></label>
         <select class="sf-inp" id="sf-time" onchange="sfShowError('err-time', false)">
@@ -403,6 +410,25 @@
           <div class="sf-inp-error-msg" id="err-multi-address">กรุณาระบุข้อมูลที่อยู่ทั้งหมด</div>
         </div>
       </div>
+
+            <!-- [NEW] Photo Upload Section -->
+      <div class="sf-form-group">
+        <label class="sf-lbl">แนบรูปภาพ (ถ้ามี)</label>
+        <div id="sf-photo-upload-area" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s;">
+          <div id="sf-photo-prompt">
+            <i class="ti ti-photo-plus" style="font-size: 32px; color: #94a3b8; margin-bottom: 10px; display: block;"></i>
+            <div style="font-size: 13px; color: #64748b; font-weight: 600;">คลิกเพื่อเลือกรูปภาพ หรือลากมาวาง</div>
+            <div style="font-size: 11px; color: #94a3b8;">(ขนาดไม่เกิน 5MB)</div>
+          </div>
+          <div id="sf-photo-preview-wrapper" style="display: none; position: relative;">
+            <img id="sf-photo-preview" style="max-width: 100%; max-height: 200px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <button type="button" id="sf-photo-clear-btn" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 16px; cursor: pointer; line-height: 1;">&times;</button>
+          </div>
+        </div>
+        <input type="file" id="sf-photo-input" accept="image/*" style="display: none;">
+        <div class="sf-inp-error-msg" id="err-photo"></div>
+      </div>
+
 
     </div>
 
