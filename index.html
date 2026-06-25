@@ -420,7 +420,7 @@
     top: 50%;
     left: 50%;
     width: 500px; /* ความกว้างของ card ที่ขยาย */
-    transform: translate(-50%, -50%) scale(0.9);
+    transform: translate(-80%, -80%) scale(0.9);
     opacity: 0;
     visibility: hidden;
     z-index: 1001; /* [2] เพิ่ม z-index ให้สูงกว่า overlay */
@@ -746,25 +746,24 @@
 
       /* Tinder card detail view on mobile */
       .plan-detail-hover {
-        position: fixed; /* [CHANGE] เปลี่ยนเป็น fixed เพื่อให้ลอยทับทุกอย่าง */
-        top: 100%; /* [CHANGE] เริ่มต้นจากด้านล่างของหน้าจอ */
+        position: absolute; /* Change from fixed to absolute */
+        top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        transform: translateY(0); /* [CHANGE] ใช้ translateY สำหรับ animation */
-        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); /* [CHANGE] ปรับ animation */
-        z-index: 1001;
-        pointer-events: none;
-        display: flex; /* [NEW] */
-        flex-direction: column; /* [NEW] */
+        transform: scale(1); /* No more scaling */
+        border-radius: 20px;
+        overflow: hidden;
       }
       .plan-container.is-active .plan-detail-hover {
-        transform: translateY(-100%); /* [CHANGE] เลื่อนขึ้นมาเต็มจอ */
-        pointer-events: auto;
+        transform: scale(1);
       }
       .plan-container.is-active .plan-summary {
         opacity: 0;
         pointer-events: none;
+      }
+      .detail-close-btn {
+        top: 10px; right: 10px;
       }
 
       /* [NEW] Adjust tinder-card content for mobile */
@@ -772,15 +771,13 @@
         display: flex;
         flex-direction: column;
         height: 100%;
-        border-radius: 0; /* [NEW] ไม่มีขอบโค้งเมื่อเต็มจอ */
-        box-shadow: none; /* [NEW] ไม่ต้องมีเงาเมื่อเต็มจอ */
       }
       .tc-header { padding: 15px 20px; }
       .tc-header .tc-plan-name { font-size: 14px; }
       .tc-table-scroll { flex: 1; }
       .tc-footer { padding: 10px 20px; font-size: 10px; }
       .tinder-counter { top: 18px; left: 20px; }
-      .detail-close-btn { top: 15px; right: 15px; width: 36px; height: 36px; font-size: 20px; background: #f1f5f9; border-color: #e2e8f0; }
+      .detail-close-btn { top: 15px; right: 15px; width: 32px; height: 32px; font-size: 18px; }
     }
 
     /* [NEW] Sum Insured Input Group Styles */
