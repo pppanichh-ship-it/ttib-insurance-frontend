@@ -853,22 +853,22 @@ function render() {
   // [PERF] ย้ายการเข้าถึง DOM มาไว้หลังจากตรวจสอบเงื่อนไขแล้ว
   const sumInput = document.getElementById('inp-sum');
   const covSel   = document.getElementById('sel-cov');
-  const sortSel  = document.getElementById('sel-sort');
   const selectedBiz = bizSel.value;
   const normBiz     = normalize(selectedBiz);
   const selectedSum = sumInput ? (Number(String(sumInput.value).replace(/,/g, ''))||0) : 0;
-  const covFilter = covSel ? covSel.value : 'all';
+  const covFilter   = covSel ? covSel.value : 'all';
 
   let validPlans = allBusinessMappings.filter(m => normalize(m.business) === normBiz);
-  if (covFilter === 'ar') validPlans = validPlans.filter(p => { const ct = String(p.covType || 'ประกันแบบเสี่ยงภัยทุกชนิด (All Risk)').toLowerCase(); return ct.includes('ประกันแบบเสี่ยงภัยทุกชนิด (All Risk)') ; });
-  if (covFilter === 'fp') validPlans = validPlans.filter(p => { const ct = String(p.covType || 'ประกันแบบระบุภัย (Named Perils)').toLowerCase(); return ct.includes('ประกันแบบระบุภัย (Named Perils)'); });
+  if (covFilter === 'ar') validPlans = validPlans.filter(p => { const ct = String(p.covType || '').toLowerCase(); return ct.includes('ประกันแบบเสี่ยงภัยทุกชนิด (all risk)'); });
+  if (covFilter === 'fp') validPlans = validPlans.filter(p => { const ct = String(p.covType || '').toLowerCase(); return ct.includes('ประกันแบบระบุภัย (named perils)'); });
 
   const currentPremiums = [];
   validPlans.forEach(plan => {
     currentPremiums.push(premiumDatabase[selectedSum]?.[plan.searchKey]??0);
   });
 
-  const sortBy  = sortSel ? sortSel.value : 'coverage';
+  // [CHANGE] ตั้งค่าการเรียงตามเบี้ยประกันเป็นค่าเริ่มต้นเสมอ
+  const sortBy  = 'premium';
   let indices   = validPlans.map((_,i)=>i);
   if (sortBy==='coverage') {
     indices.sort((a, b) => {
@@ -878,6 +878,14 @@ function render() {
     });
   } else if (sortBy==='company') {
     indices.sort((a,b)=>validPlans[a].company.localeCompare(validPlans[b].company));
+  } else if (sortBy === 'premium') {
+    indices.sort((a, b) => {
+      const premA = currentPremiums[a] || 0;
+      const premB = currentPremiums[b] || 0;
+      if (premA === 0 && premB > 0) return 1;  // แผนที่ไม่มีราคา (ติดต่อเจ้าหน้าที่) ไปอยู่ท้ายสุด
+      if (premB === 0 && premA > 0) return -1;
+      return premA - premB; // เรียงจากน้อยไปมาก
+    });
   }
 
   const sortedPlans    = indices.map(i=>validPlans[i]);
@@ -2698,20 +2706,48 @@ document.addEventListener('DOMContentLoaded', () => {
   loadRecentSearches(); // [NEW] Load recent searches on startup
   loadFavorites(); // [FAV] Load saved favorites on startup
 
-  // [NEW] Sum Insured Range Slider Handler
-  const sumRange = document.getElementById('inp-sum-range');
-  const sumValue = document.getElementById('sum-range-value');
-  const sumInput = document.getElementById('inp-sum'); // Hidden input
+  // [NEW] Sum Insured Input with +/- buttons
+  const sumInput = document.getElementById('inp-sum');
+  const btnMinus = document.getElementById('btn-sum-minus');
+  const btnPlus = document.getElementById('btn-sum-plus');
+  const MIN_SUM = 500000;
+  const MAX_SUM = 50000000;
+  const STEP = 500000;
 
-  if (sumRange && sumValue && sumInput) {
-    const updateSum = () => {
-      const val = Number(sumRange.value);
-      sumValue.textContent = val.toLocaleString('th-TH') + ' บาท';
-      sumInput.value = val; // Sync with hidden input
-      debouncedRender(); // Use debounced render for better performance
-    };
-    sumRange.addEventListener('input', updateSum);
-    updateSum(); // Initial call
+  const updateSumFromInput = () => {
+    let val = parseFloat(String(sumInput.value).replace(/,/g, '')) || MIN_SUM;
+    val = Math.max(MIN_SUM, Math.min(MAX_SUM, val));
+    sumInput.value = val.toLocaleString('th-TH');
+    btnMinus.disabled = (val <= MIN_SUM);
+    btnPlus.disabled = (val >= MAX_SUM);
+    debouncedRender();
+  };
+
+  const adjustSum = (amount) => {
+    let currentVal = parseFloat(String(sumInput.value).replace(/,/g, '')) || MIN_SUM;
+    let newVal = currentVal + amount;
+    newVal = Math.max(MIN_SUM, Math.min(MAX_SUM, newVal));
+    sumInput.value = newVal.toLocaleString('th-TH');
+    updateSumFromInput();
+  };
+
+  if (sumInput && btnMinus && btnPlus) {
+    btnMinus.addEventListener('click', () => adjustSum(-STEP));
+    btnPlus.addEventListener('click', () => adjustSum(STEP));
+
+    sumInput.addEventListener('change', updateSumFromInput);
+    sumInput.addEventListener('input', () => {
+      // Allow typing commas
+      const currentVal = sumInput.value;
+      const numericVal = currentVal.replace(/[^0-9]/g, '');
+      if (numericVal) {
+        sumInput.value = Number(numericVal).toLocaleString('th-TH');
+      }
+    });
+
+    // Initial state
+    sumInput.value = MIN_SUM.toLocaleString('th-TH');
+    updateSumFromInput();
   }
 
   // โหลดที่อยู่จาก Cache เพื่อความรวดเร็ว

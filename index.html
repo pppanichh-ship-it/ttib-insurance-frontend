@@ -746,24 +746,25 @@
 
       /* Tinder card detail view on mobile */
       .plan-detail-hover {
-        position: absolute; /* Change from fixed to absolute */
-        top: 0;
+        position: fixed; /* [CHANGE] เปลี่ยนเป็น fixed เพื่อให้ลอยทับทุกอย่าง */
+        top: 100%; /* [CHANGE] เริ่มต้นจากด้านล่างของหน้าจอ */
         left: 0;
         width: 100%;
         height: 100%;
-        transform: scale(1); /* No more scaling */
-        border-radius: 20px;
-        overflow: hidden;
+        transform: translateY(0); /* [CHANGE] ใช้ translateY สำหรับ animation */
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); /* [CHANGE] ปรับ animation */
+        z-index: 1001;
+        pointer-events: none;
+        display: flex; /* [NEW] */
+        flex-direction: column; /* [NEW] */
       }
       .plan-container.is-active .plan-detail-hover {
-        transform: scale(1);
+        transform: translateY(-100%); /* [CHANGE] เลื่อนขึ้นมาเต็มจอ */
+        pointer-events: auto;
       }
       .plan-container.is-active .plan-summary {
         opacity: 0;
         pointer-events: none;
-      }
-      .detail-close-btn {
-        top: 10px; right: 10px;
       }
 
       /* [NEW] Adjust tinder-card content for mobile */
@@ -771,13 +772,47 @@
         display: flex;
         flex-direction: column;
         height: 100%;
+        border-radius: 0; /* [NEW] ไม่มีขอบโค้งเมื่อเต็มจอ */
+        box-shadow: none; /* [NEW] ไม่ต้องมีเงาเมื่อเต็มจอ */
       }
       .tc-header { padding: 15px 20px; }
       .tc-header .tc-plan-name { font-size: 14px; }
       .tc-table-scroll { flex: 1; }
       .tc-footer { padding: 10px 20px; font-size: 10px; }
       .tinder-counter { top: 18px; left: 20px; }
-      .detail-close-btn { top: 15px; right: 15px; width: 32px; height: 32px; font-size: 18px; }
+      .detail-close-btn { top: 15px; right: 15px; width: 36px; height: 36px; font-size: 20px; background: #f1f5f9; border-color: #e2e8f0; }
+    }
+
+    /* [NEW] Sum Insured Input Group Styles */
+    .sum-input-group {
+      display: flex;
+      align-items: center;
+    }
+    .sum-btn {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      width: 44px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 20px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .sum-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); background: #f8fafc; }
+    .sum-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .sum-btn-minus { border-radius: 12px 0 0 12px; }
+    .sum-btn-plus { border-radius: 0 12px 12px 0; }
+    .sum-input-display {
+      text-align: center;
+      font-weight: 800;
+      color: var(--accent);
+      border-left: none;
+      border-right: none;
     }
   </style>
 
@@ -939,22 +974,12 @@
 
       <!-- [NEW] Sum Insured Range Slider -->
       <div class="fg" style="flex: 2; min-width: 280px;">
-        <label class="flbl" for="inp-sum-range">ทุนประกันภัย</label>
-        <div class="sum-range-container">
-          <input type="range" id="inp-sum-range" class="fctrl-range" min="500000" max="50000000" step="500000" value="500000">
-          <div id="sum-range-value" class="sum-range-value">500,000 บาท</div>
+        <label class="flbl" for="inp-sum">ทุนประกันภัย</label>
+        <div class="sum-input-group">
+          <button type="button" class="sum-btn sum-btn-minus" id="btn-sum-minus" title="ลดทุนประกัน">-</button>
+          <input type="text" id="inp-sum" class="fctrl sum-input-display" value="500,000">
+          <button type="button" class="sum-btn sum-btn-plus" id="btn-sum-plus" title="เพิ่มทุนประกัน">+</button>
         </div>
-      </div>
-      <!-- Hidden original input for compatibility -->
-      <input type="hidden" id="inp-sum" value="500000">
-
-      <div class="fg">
-        <label class="flbl" for="sel-sort">เรียงตาม</label>
-        <select class="fctrl" id="sel-sort" onchange="render()">
-          <option value="premium">เบี้ยน้อย → มาก</option>
-          <option value="coverage">คุ้มครองมาก → น้อย</option>
-          <option value="company">ชื่อบริษัท</option>
-        </select>
       </div>
 
       <div class="fg" style="display:flex; align-items:flex-end;">
