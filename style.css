@@ -1082,21 +1082,27 @@ select.fctrl { cursor: pointer; }
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Faster, smoother transition */
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 5);
 }
+/* [NEW] Flexbox layout for detail card */
+.tinder-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ensure it takes full height of its container */
+}
 
 /* [NEW] Enhanced scrollable area with fading effect */
 .tc-table-scroll {
-  max-height: 280px;
+  max-height: 400px;
+  flex-grow: 1; /* Allow this element to grow and fill available space */
   overflow-y: auto;
-  padding: 0 12px; /* Adjusted padding for better spacing */
-  margin: 15px -12px; /* Negative margin to extend fade to edges */
+  padding: 0 16px; /* Add padding to the content inside */
+  margin: 0 -16px; /* Negative margin to make scrollbar align with card edges */
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 20px, black 90%, transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, black 20px, black 90%, transparent 100%);
 }
 
 /* [NEW] Modern, thinner scrollbar */
 .tc-table-scroll::-webkit-scrollbar { width: 4px; }
-.tc-table-scroll::-webkit-scrollbar-track { background: transparent; }
-.tc-table-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 20px; border: 1px solid #fff; }
+.tc-table-scroll::-webkit-scrollbar-track { background: transparent; } .tc-table-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 20px; border: 1px solid #fff; }
 
 .tinder-card:hover {
   transform: translateY(-8px) scale(1.02); /* More subtle hover effect */
@@ -1120,6 +1126,7 @@ select.fctrl { cursor: pointer; }
   border-radius: 14px; /* Adjusted to match inner elements */
   position: relative;
   margin-bottom: 10px;
+  flex-shrink: 0; /* Prevent header from shrinking */
   overflow: hidden;
   border: 1px solid rgba(226, 232, 240, 0.7);
 }
@@ -1190,7 +1197,8 @@ select.fctrl { cursor: pointer; }
 .tc-section-title {
     font-size: 11px; font-weight: 800; color: #94a3b8;
     text-transform: uppercase; letter-spacing: 0.5px;
-    margin: 15px 0 10px; padding-bottom: 5px; border-bottom: 1px solid #f1f5f9;
+    margin: 10px 0 10px; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;
+    flex-shrink: 0; /* Prevent title from shrinking */
 }
 
 .tc-cov-row {
@@ -1257,6 +1265,7 @@ select.fctrl { cursor: pointer; }
 .tc-footer {
     margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9;
     font-size: 10px; color: #94a3b8; text-align: center; font-style: italic;
+    flex-shrink: 0; /* Prevent footer from shrinking */
 }
 
 .tinder-dots {

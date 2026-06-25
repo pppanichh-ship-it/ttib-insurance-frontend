@@ -488,39 +488,52 @@
   .detail-close-btn:hover { transform: scale(1.1) rotate(90deg); color: var(--danger); }
 
   /* ── [NEW] Coverage Detail Group (details/summary) ── */
-  .cov-group {
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .cov-group summary {
-    padding: 14px 10px;
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--text-1);
-    cursor: pointer;
-    list-style: none; /* Hide default marker */
-    position: relative;
-    transition: background 0.2s;
-  }
-  .cov-group summary:hover { background: #f8fafc; }
-  .cov-group summary::before {
-    content: '+';
-    position: absolute;
-    left: -8px;
-    font-weight: 800;
-    color: var(--text-3);
-    transition: transform 0.2s ease-in-out;
-  }
-  .cov-group[open] > summary::before {
-    content: '−';
-    transform: rotate(180deg);
-  }
-  .cov-group ul {
-    list-style-type: disc;
-    padding: 0px 10px 15px 30px;
-    font-size: 12.5px;
-    color: var(--text-2);
-    line-height: 1.8;
-  }
+     .cov-group {
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .cov-group:last-child { border-bottom: none; }
+    .cov-group summary {
+      padding: 12px 10px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-1);
+      cursor: pointer;
+      list-style: none; /* Hide default marker */
+      position: relative;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cov-group summary:hover { background: #f8fafc; }
+    .cov-group summary::after {
+      content: '\\eab6'; /* ti-chevron-down */
+      font-family: 'tabler-icons';
+      font-size: 16px;
+      color: var(--text-3);
+      transition: transform 0.2s ease-in-out;
+    }
+    .cov-group[open] > summary::after {
+      transform: rotate(180deg);
+    }
+    .cov-items-list {
+      padding: 0px 10px 15px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cov-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+    .cov-item.is-covered { color: var(--text-1); font-weight: 600; }
+    .cov-item.is-covered i { color: #10b981; }
+    .cov-item.is-not-covered { color: #94a3b8; text-decoration: line-through; }
+    .cov-item.is-not-covered i { color: #cbd5e1; }
+    .cov-item i { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
 
   /* ── [NEW] Sum Insured Range Slider ── */
   .sum-range-container {

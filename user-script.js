@@ -1030,35 +1030,40 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
   const isFavorited = favoritePlans.some(p => normalizeKey(p.company, p.plan, p.group) === normalizeKey(plan.company, plan.plan, plan.group));
   let detailHtml = "";
   const mIdx = getMarkSheetColumnIndex(plan.company, plan.plan, plan.group);
-  if (mIdx !== -1) {
-    const topicItems = new Map();
-    for (let r = 3; r < rawMarkData.length; r++) {
-      const row = rawMarkData[r];
-      if (!row || !row[0]) continue;
-      const category = String(row[0]).trim();
-      const itemName = row[1] ? String(row[1]).trim() : "";
-      if (/หมวดหมู่ประกันภัย/.test(category)) continue;
-      const val = String(row[mIdx] || '').trim();
-      const isOk = val === '1' || val === '✓' || val.toLowerCase() === 'yes';
-      if (isOk) {
-        if (!topicItems.has(category)) topicItems.set(category, []);
-        if (itemName) topicItems.get(category).push(itemName);
-      }
-    }
 
-    let isFirstGroup = true;
-    topicItems.forEach((items, category) => {
-      const categoryEsc = escapeHtml(category);
-      detailHtml += `
-        <details class="cov-group" ${isFirstGroup ? 'open' : ''}>
-          <summary>${categoryEsc}</summary>
-          <ul>
-            ${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
-          </ul>
-        </details>`;
-      isFirstGroup = false;
-    });
+  // [NEW] แสดงรายการความคุ้มครองทั้งหมดเสมอ และทำเครื่องหมายว่าคุ้มครองหรือไม่
+  const topicItems = new Map();
+  for (let r = 3; r < rawMarkData.length; r++) {
+    const row = rawMarkData[r];
+    if (!row || !row[0] || !row[1]) continue;
+    const category = String(row[0]).trim();
+    const itemName = String(row[1]).trim();
+    if (/หมวดหมู่ประกันภัย/.test(category)) continue;
+
+    const val = mIdx !== -1 ? String(row[mIdx] || '').trim() : '';
+    const isOk = val === '1' || val === '✓' || val.toLowerCase() === 'yes';
+
+    if (!topicItems.has(category)) topicItems.set(category, []);
+    topicItems.get(category).push({ name: itemName, covered: isOk });
   }
+
+  let isFirstGroup = true;
+  topicItems.forEach((items, category) => {
+    const categoryEsc = escapeHtml(category);
+    detailHtml += `
+      <details class="cov-group" ${isFirstGroup ? 'open' : ''}>
+        <summary>${categoryEsc}</summary>
+        <div class="cov-items-list">
+          ${items.map(item => `
+            <div class="cov-item ${item.covered ? 'is-covered' : 'is-not-covered'}">
+              <i class="ti ${item.covered ? 'ti-circle-check-filled' : 'ti-circle-x-filled'}"></i>
+              <span>${escapeHtml(item.name)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </details>`;
+    isFirstGroup = false;
+  });
 
   return `
     <div id="${cardId}" class="plan-container" style="--brand-color: ${cColor};" data-plan-active="false">
@@ -1114,7 +1119,10 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
             <div class="tc-plan-name">${escapeHtml(plan.plan)}</div>
             ${plan.group ? `<div class="tc-group-name">กลุ่ม: ${escapeHtml(plan.group)}</div>` : ''}
           </div>
-          <div class="tc-table-scroll">${detailHtml ? `<div class="cov-section-title">รายการที่คุ้มครอง</div>${detailHtml}` : '<div class="no-cov-data">ไม่มีข้อมูลความคุ้มครอง</div>'}</div>
+          <div class="cov-section-title">รายการที่คุ้มครอง</div>
+          <div class="tc-table-scroll">
+            ${detailHtml || '<div class="no-cov-data">ไม่มีข้อมูลความคุ้มครอง</div>'}
+          </div>
           <div class="tc-footer">เงื่อนไขเป็นไปตามที่บริษัทกำหนด</div>
         </div>
       </div>
