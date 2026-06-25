@@ -419,6 +419,18 @@ function sfValidateStep() {
       }
     });
 
+    // [NEW] ตรวจสอบสถานะผู้ทำประกันและประวัติการเคลม
+    const insuredStatus = document.getElementById('sf-insured-status')?.value;
+    if (!insuredStatus || insuredStatus === '-') {
+      sfShowError('err-insured-status', true, 'กรุณาเลือกสถานะผู้ทำประกัน');
+      valid = false;
+    } else {
+      sfShowError('err-insured-status', false);
+    }
+
+    // ประวัติการเคลมถูกตั้งค่าเริ่มต้นเป็น 'N' อยู่แล้ว จึงไม่จำเป็นต้อง validate ค่าว่าง
+    // แต่สามารถเพิ่ม logic ตรวจสอบเพิ่มเติมได้หากต้องการ
+
     // ── ส่วนที่ 2: ชื่อ + เบอร์โทร + ที่อยู่ ──────────────────────────────────
     const requiredFields = [
       { id: 'fname', label: 'ชื่อ', msg: 'ขอทราบชื่อของคุณด้วยครับ' },

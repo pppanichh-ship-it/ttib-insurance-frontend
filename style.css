@@ -1263,9 +1263,13 @@ select.fctrl { cursor: pointer; }
 .tc-cov-row.no .tc-topic-val { color: #cbd5e1; font-weight: 400; }
 
 .tc-footer {
-    margin-top: 15px; padding-top: 10px; border-top: 1px solid #f1f5f9;
-    font-size: 10px; color: #94a3b8; text-align: center; font-style: italic;
-    flex-shrink: 0; /* Prevent footer from shrinking */
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #f1f5f9;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .tinder-dots {
