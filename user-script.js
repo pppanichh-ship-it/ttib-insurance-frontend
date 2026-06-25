@@ -1,5 +1,4 @@
-﻿
-const COMPANY_COLORS = {
+﻿const COMPANY_COLORS = {
   AAGI: "#1D9E75", BKI: "#378ADD", TMSTH: "#BA7517",
   CHUBB: "#D85A30", MSIG: "#7F77DD", TIP: "#D4537E"
 };
@@ -1370,6 +1369,21 @@ function openFavoritesModal() {
   const target = modal.querySelector('.modal-win');
   if (!target) return;
 
+  // [NEW] ทำให้ Modal เต็มหน้าจอสำหรับ Mobile
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    modal.style.padding = '0';
+    Object.assign(target.style, {
+      width: '100%',
+      height: '100%',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      borderRadius: '0',
+      margin: '0',
+      display: 'flex',
+      flexDirection: 'column'
+    });
+  }
   const uniqueBusinesses = new Set(favoritePlans.map(p => p.business).filter(Boolean));
   const businessCount = uniqueBusinesses.size;
 
