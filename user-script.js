@@ -1,4 +1,5 @@
-﻿const COMPANY_COLORS = {
+﻿
+const COMPANY_COLORS = {
   AAGI: "#1D9E75", BKI: "#378ADD", TMSTH: "#BA7517",
   CHUBB: "#D85A30", MSIG: "#7F77DD", TIP: "#D4537E"
 };
@@ -1123,8 +1124,8 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
 
 /**
  * [NEW] Toggles the detail view for a plan card.
- * @param {HTMLElement} el - The element that was clicked.
- * @param {boolean} [forceShow] - Optional. Force show/hide.
+ * @param {HTMLElement} el 
+ * @param {boolean} [forceShow]
  */
 function togglePlanDetail(el, forceShow) {
   const container = el.closest('.plan-container');
@@ -1369,11 +1370,11 @@ function openFavoritesModal() {
   const target = modal.querySelector('.modal-win');
   if (!target) return;
 
-  // [NEW] ทำให้ Modal เต็มหน้าจอสำหรับ Mobile
+  // ทำให้ Modal เต็มหน้าจอสำหรับ Mobile
   const isMobile = window.innerWidth <= 768;
   if (isMobile) {
     modal.style.padding = '0';
-    Object.assign(target.style, {
+    Object.assign(target.style, { // ใช้ Object.assign เพื่อความกระชับ
       width: '100%',
       height: '100%',
       maxWidth: '100vw',
@@ -1383,6 +1384,11 @@ function openFavoritesModal() {
       display: 'flex',
       flexDirection: 'column'
     });
+    // ทำให้ส่วน body ของ modal สามารถ scroll ได้
+    const bodyEl = target.querySelector('.m-body');
+    if (bodyEl) {
+      bodyEl.style.flex = '1';
+    }
   }
   const uniqueBusinesses = new Set(favoritePlans.map(p => p.business).filter(Boolean));
   const businessCount = uniqueBusinesses.size;
@@ -1402,14 +1408,14 @@ function openFavoritesModal() {
   const titleCount = titleParts.length > 0 ? `(${titleParts.join(', ')})` : '';
 
   let contentHtml = `
-    <div class="m-header" style="background:#f8fafc; border-bottom:1px solid #e2e8f0; padding:16px 24px;">
-      <h2 style="display:flex; align-items:center; gap:10px; font-size:18px; color:#1e293b;">
+    <div class="m-header" style="background:#f8fafc; border-bottom:1px solid #e2e8f0; padding:16px 20px; position:sticky; top:0; z-index:10;">
+      <h2 style="display:flex; align-items:center; gap:10px; font-size:16px; color:#1e293b;">
         <i class="ti ti-heart-filled" style="color:#F43F5E;"></i> 
         รายการโปรด ${titleCount}
       </h2>
       <div style="display:flex; align-items:center; gap:12px;">
         ${clearBtnHtml}
-        <span class="m-close" onclick="this.closest('.modal-overlay').classList.remove('active')" style="font-size:26px;">&times;</span>
+        <span class="m-close" onclick="this.closest('.modal-overlay').classList.remove('active')" style="font-size:24px;">&times;</span>
       </div>
     </div>`;
 
@@ -1418,8 +1424,8 @@ function openFavoritesModal() {
       <div style="width:120px; height:120px; background:#f1f5f9; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 25px;">
         <i class="ti ti-heart-broken" style="font-size:56px; color:#cbd5e1;"></i>
       </div>
-      <p style="font-size:18px; color:#475569; font-weight:700;">ยังไม่มีแผนประกันที่บันทึกไว้</p>
-      <p style="font-size:14px; color:#94a3b8; max-width:400px; margin:8px auto 0;">
+      <p style="font-size:16px; color:#475569; font-weight:700;">ยังไม่มีแผนประกันที่บันทึกไว้</p>
+      <p style="font-size:13px; color:#94a3b8; max-width:320px; margin:8px auto 0; line-height:1.6;">
         กดที่รูปหัวใจ <i class="ti ti-heart"></i> บนการ์ดแผนประกันเพื่อบันทึกแผนที่สนใจไว้ดูภายหลัง
       </p>
     </div>`;
@@ -1431,7 +1437,7 @@ function openFavoritesModal() {
       const isChecked = favoritePlans.some(p => normalizeKey(p.company, p.plan, p.group) === planId);
 
       return `
-        <div class="plan-summary fav-card" style="--brand-color: ${cColor};">
+        <div class="plan-summary fav-card" style="--brand-color: ${cColor}; width:100%; max-width:420px; margin:0 auto;">
           <label class="container" onclick="toggleFavorite(this); this.parentElement.remove(); event.stopPropagation()"
             data-business="${escapeHtml(item.business || '')}"
             data-company="${escapeHtml(item.company)}" data-plan="${escapeHtml(item.plan)}" data-group="${escapeHtml(item.group || '')}"
@@ -1441,22 +1447,22 @@ function openFavoritesModal() {
             <div class="checkmark"><svg viewBox="0 0 256 256"><rect fill="none" height="256" width="256"></rect><path d="M224.6,51.9a59.5,59.5,0,0,0-43-19.9,60.5,60.5,0,0,0-44,17.6L128,59.1l-7.5-7.4C97.2,28.3,59.2,26.3,35.9,47.4a59.9,59.9,0,0,0-2.3,87l83.1,83.1a15.9,15.9,0,0,0,22.6,0l81-81C243.7,113.2,245.6,75.2,224.6,51.9Z" stroke-width="20px" stroke="#000" fill="none"></path></svg></div>
           </label>
           <div class="summary-header">
-            <div class="summary-logo" style="width:80px; height:80px;">${cLogo ? `<img src="${cLogo}" alt="${escapeHtml(item.company)}">` : `<span>${escapeHtml(item.company)}</span>`}</div>
+            <div class="summary-logo" style="width:60px; height:60px;">${cLogo ? `<img src="${cLogo}" alt="${escapeHtml(item.company)}">` : `<span>${escapeHtml(item.company)}</span>`}</div>
             <div class="summary-title">
-              ${item.business ? `<div class="cs-tag" style="margin-bottom:8px; background:#f1f5f9; color:#475569; border:1px solid #e2e8f0;">${escapeHtml(item.business)}</div>` : ''}
-              <div class="summary-company-name" style="font-size:16px;">${escapeHtml(item.company)}</div>
-              <div class="plan-name" style="font-size:14px; color: var(--text-2);">${escapeHtml(item.plan)}</div>
+              ${item.business ? `<div class="cs-tag" style="margin-bottom:6px; background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:11px;">${escapeHtml(item.business)}</div>` : ''}
+              <div class="summary-company-name" style="font-size:14px;">${escapeHtml(item.company)}</div>
+              <div class="plan-name" style="font-size:12px; color: var(--text-2);">${escapeHtml(item.plan)}</div>
               ${item.group ? `<div class="group-name">${escapeHtml(item.group)}</div>` : ''}
-              ${item.covType ? `<div class="cs-tag cs-tag-type" style="margin-top:8px; font-size:10px;">${escapeHtml(item.covType)}</div>` : ''}
+              ${item.covType ? `<div class="cs-tag cs-tag-type" style="margin-top:6px; font-size:10px;">${escapeHtml(item.covType)}</div>` : ''}
             </div>
           </div>
-          <button type="button" class="btn-h" style="margin-top:15px; width:100%; height: 44px; font-size: 14px; border-radius: 12px;" onclick="goToUserForm('${escapeHtml(item.company)}', '${escapeHtml(item.plan)}', '${escapeHtml(item.group || '')}', '${escapeHtml(item.business || '')}', '${item.sumInsured || ''}')">
+          <button type="button" class="btn-h" style="margin-top:12px; width:100%; height: 40px; font-size: 13px; border-radius: 10px;" onclick="goToUserForm('${escapeHtml(item.company)}', '${escapeHtml(item.plan)}', '${escapeHtml(item.group || '')}', '${escapeHtml(item.business || '')}', '${item.sumInsured || ''}')">
             <i class="ti ti-phone-call"></i>
             <span>สนใจแผนนี้</span>
           </button>
         </div>`;
     }).join('');
-    contentHtml += `<div class="m-body" style="background:#f1f5f9; padding:24px; display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:20px;">${favListHtml}</div>`;
+    contentHtml += `<div class="m-body" style="background:#f1f5f9; padding:20px; display:grid; grid-template-columns:1fr; gap:16px; overflow-y:auto;">${favListHtml}</div>`;
   }
 
   target.innerHTML = contentHtml;
