@@ -1049,14 +1049,20 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
 
   let isFirstGroup = true;
   topicItems.forEach((items, category) => {
+    // [NEW] กรองเอาเฉพาะรายการที่คุ้มครอง
+    const coveredItems = items.filter(item => item.covered);
+
+    // [NEW] ถ้าในหมวดหมู่นี้ไม่มีรายการที่คุ้มครองเลย ให้ข้ามไป ไม่ต้องแสดงผล
+    if (coveredItems.length === 0) return;
+
     const categoryEsc = escapeHtml(category);
     detailHtml += `
       <details class="cov-group" ${isFirstGroup ? 'open' : ''}>
         <summary>${categoryEsc}</summary>
         <div class="cov-items-list">
-          ${items.map(item => `
-            <div class="cov-item ${item.covered ? 'is-covered' : 'is-not-covered'}">
-              <i class="ti ${item.covered ? 'ti-circle-check-filled' : 'ti-circle-x-filled'}"></i>
+          ${coveredItems.map(item => `
+            <div class="cov-item is-covered">
+              <i class="ti ti-circle-check-filled"></i>
               <span>${escapeHtml(item.name)}</span>
             </div>
           `).join('')}
@@ -1470,7 +1476,7 @@ function openFavoritesModal() {
           </button>
         </div>`;
     }).join('');
-    contentHtml += `<div class="m-body" style="background:#f1f5f9; padding:20px; display:grid; grid-template-columns:1fr; gap:16px; overflow-y:auto;">${favListHtml}</div>`;
+    contentHtml += `<div class="m-body fav-list-container">${favListHtml}</div>`;
   }
 
   target.innerHTML = contentHtml;

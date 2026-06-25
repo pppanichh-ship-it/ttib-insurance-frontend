@@ -1487,6 +1487,16 @@ select.fctrl { cursor: pointer; }
 }
 
 /* ── [NEW] Favorites Modal Styles ── */
+.fav-list-container {
+  background: #f1f5f9;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  overflow-y: auto;
+  flex: 1; /* Ensure it fills space in flex container on mobile */
+}
+
 .fav-card {
   position: relative;
   cursor: default;
