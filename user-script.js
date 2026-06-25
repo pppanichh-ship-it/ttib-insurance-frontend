@@ -1129,12 +1129,7 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
           <div class="tc-table-scroll">
             ${detailHtml || '<div class="no-cov-data">ไม่มีข้อมูลความคุ้มครอง</div>'}
           </div>
-          <div class="tc-footer">
-            <button class="btn-h" onclick="openDetailModal()">
-              <i class="ti ti-clipboard-list"></i>
-                <span>รายละเอียด</span>
-            </button>
-          </div>
+          <div class="tc-footer">เงื่อนไขเป็นไปตามที่บริษัทกำหนด</div>
         </div>
       </div>
       <div class="plan-detail-overlay" onclick="togglePlanDetail(this, false)"></div>

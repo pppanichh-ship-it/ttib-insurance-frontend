@@ -216,13 +216,12 @@
 
       <!-- สถานะผู้ทำประกัน (Radio Chip) -->
       <div class="sf-form-group">
-        <label class="sf-lbl">สถานะผู้ทำประกันอาคารและทรัพย์สิน <span class="sf-req">*</span></label>
+        <label class="sf-lbl">สถานะผู้ทำประกันอาคารและทรัพย์สิน</label>
         <div class="sf-radio-group" id="sf-status-group">
-          <span class="sf-radio-chip" data-val="เจ้าของ" onclick="sfSelectChip(this,'sf-status-group','sf-insured-status'); sfShowError('err-insured-status', false);">เจ้าของ</span>
-          <span class="sf-radio-chip" data-val="ผู้เช่า" onclick="sfSelectChip(this,'sf-status-group','sf-insured-status'); sfShowError('err-insured-status', false);">ผู้เช่า</span>
+          <span class="sf-radio-chip" data-val="เจ้าของ" onclick="sfSelectChip(this,'sf-status-group','sf-insured-status')">เจ้าของ</span>
+          <span class="sf-radio-chip" data-val="ผู้เช่า" onclick="sfSelectChip(this,'sf-status-group','sf-insured-status')">ผู้เช่า</span>
           <input type="hidden" id="sf-insured-status" />
         </div>
-        <div class="sf-inp-error-msg" id="err-insured-status">กรุณาระบุสถานะผู้ทำประกัน</div>
       </div>
 
       <div class="sf-form-row">
@@ -269,12 +268,11 @@
         <div class="sf-toggle-row">
           <span>เคยเคลมประกันมาก่อนหรือไม่</span>
           <div class="sf-toggle-group">
-            <button class="sf-toggle-btn" id="sf-claim-yes-btn" onclick="sfToggleClaim('Y'); sfShowError('err-claim', false);">เคย</button>
-            <button class="sf-toggle-btn" id="sf-claim-no-btn" onclick="sfToggleClaim('N'); sfShowError('err-claim', false);">ไม่เคย</button>
+            <button class="sf-toggle-btn" id="sf-claim-yes-btn" onclick="sfToggleClaim('Y')">เคย</button>
+            <button class="sf-toggle-btn active-n" id="sf-claim-no-btn" onclick="sfToggleClaim('N')">ไม่เคย</button>
           </div>
         </div>
-        <input type="hidden" id="sf-claim-val" value="" />
-        <div class="sf-inp-error-msg" id="err-claim">กรุณาระบุประวัติการเคลม</div>
+        <input type="hidden" id="sf-claim-val" value="N" />
       </div>
 
     </div>
