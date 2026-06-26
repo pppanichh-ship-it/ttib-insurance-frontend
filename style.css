@@ -174,58 +174,11 @@ body {
     width: fit-content; /* ปรับขนาดตามเนื้อหาปุ่ม */
 }
 
-/* ── แถบทักทาย (Tooltip Pop-up) เหนือปุ่มติดต่อ ── */
-.fixed-actions-bar::before {
-    content: 'ติดต่อฝ่ายขายเลย!'; /* ข้อความ Tooltip */
-    position: absolute;
-    bottom: calc(100% + 15px);
-    left: 50%; /* กำหนดจุดเริ่มต้นที่กึ่งกลาง */
-    background: #1e293b;
-    color: #fff;
-    padding: 7px 14px;
-    border-radius: 150px;
-    font-size: 11px;
-    font-weight: 800;
-    white-space: nowrap;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    opacity: 0;
-    visibility: hidden;
-    z-index: 1000;
-    transform-origin: bottom center;
-    pointer-events: none;
-}
-
-.fixed-actions-bar::after {
-    content: '';
-    position: absolute;
-    bottom: calc(100% + 7px);
-    left: 50%; /* กำหนดจุดเริ่มต้นที่กึ่งกลางสำหรับลูกศร */
-    border: 5px solid transparent;
-    border-top-color: #1e293b;
-    opacity: 0;
-    visibility: hidden;
-    z-index: 1000;
-    pointer-events: none;
-}
-
 .fixed-actions-bar.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1.09); /* ทำให้ใหญ่ขึ้นเล็กน้อยเมื่อแสดง */ /* เพิ่มอนิเมชัน Heartbeat */
     animation: heartBeat 3s ease-in-out infinite;
-}
-
-/* เรียกใช้แอนิเมชัน Tooltip เมื่อเปิดหน้าเว็บ */
-.fixed-actions-bar.show::before,
-.fixed-actions-bar.show::after {
-    animation: tooltip-pop-wobble 5s ease-in-out infinite;
-}
-
-/* [REMOVED] ซ่อน Tooltip ที่เคยแสดงเมื่อ hover */
-.fixed-actions-bar::before,
-.fixed-actions-bar::after {
-    opacity: 0 !important;
-    visibility: hidden !important;
 }
 
 /* จัดเรียงปุ่มภายในเป็นแนวนอน */
@@ -291,19 +244,6 @@ body {
     28%  { transform: translateY(0) scale(1); box-shadow: var(--sh-lg); }
     42%  { transform: translateY(-2px) scale(1.03); box-shadow: 0 0 50px rgba(35, 123, 212, 0.5), var(--sh-lg); }
     70%  { transform: translateY(0) scale(1); box-shadow: var(--sh-lg); }
-}
-
-/* แอนิเมชัน Tooltip: เด้งขึ้นมา -> สั่นทักทาย -> ค้างไว้ -> จางหายไป */
-@keyframes tooltip-pop-wobble { /* ปรับให้ tooltip ค้างอยู่บนจอนานขึ้นก่อนจางหายไป */
-    0%   { opacity: 0; visibility: hidden; transform: translateX(-50%) scale(0.5) translateY(10px); } /* เริ่มต้น */
-    2%   { opacity: 1; visibility: visible; transform: translateX(-50%) scale(1.1) translateY(-2px); } /* เด้งขึ้น */
-    4%   { transform: translateX(-50%) scale(1) translateY(0) rotate(-4deg); } /* สั่น */
-    6%   { transform: translateX(-50%) scale(1) translateY(0) rotate(4deg); } /* สั่น */
-    8%   { transform: translateX(-50%) scale(1) translateY(0) rotate(-4deg); } /* สั่น */
-    10%  { transform: translateX(-50%) scale(1) translateY(0) rotate(0); } /* หยุดสั่น */
-    70%  { opacity: 1; visibility: visible; transform: translateX(-50%) scale(1) translateY(0); } /* ค้างอยู่ */
-    73%  { opacity: 0; visibility: hidden; transform: translateX(-50%) scale(0.8) translateY(5px); } /* จางหายไป */
-    100% { opacity: 0; visibility: hidden; }
 }
 
 @keyframes wobble-button {
@@ -691,36 +631,24 @@ select.fctrl { cursor: pointer; }
 
 
 .fav-count {
-  position: sticky;
-  top: 1px;
-  right: 4px;
+  position: sticky; /* เปลี่ยนเป็น absolute เพื่อให้ยึดติดกับปุ่ม */
+  top: 13px; /* ปรับตำแหน่งให้อยู่มุมบนขวาของปุ่ม */
+  right: -5px;
   background: #F43F5E; /* Rose 500 */
   color: #fff;
-  font-size: 15px;
+  font-size: 12px; /* ลดขนาดตัวอักษรให้พอดีกับ Badge */
   font-weight: 800;
-  width: 25px;
-  height: 25px;
+  width: 22px; /* ปรับขนาด Badge ให้เล็กลง */
+  height: 22px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   border: 2px solid #fff;
   transform: scale(0);
-  z-index: 100; /* [FIX] ทำให้ Badge แสดงอยู่ชั้นบนสุดเสมอ */
-  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 100; /* ปรับ z-index ให้เหมาะสม */
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .fav-count.show {
-  transform: scale(1);
-}
-/* ==========================================================================
-   ── ✅ Status Badge — ใช้ใน notification/tracking modal
-   ========================================================================== */
-.status-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    white-space: nowrap;
-    flex-shrink: 0;
+  transform: scale(1); /* ทำให้ Badge แสดงผล (ขยายจาก 0 เป็น 1) */
 }
 
 /* Source & Campaign Badges for Admin */
@@ -1067,12 +995,11 @@ select.fctrl { cursor: pointer; }
 
 .tinder-card {
   width: 100%;
-  /* [NEW] Glassmorphism Effect */
   background: rgb(255, 255, 255);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid rgba(226, 232, 240, 0.6);
-  border-radius: 20px; /* Increased border-radius */
+  border-radius: 20px;
   padding: 16px;
   color: #697e91;
   box-sizing: border-box;
@@ -1081,12 +1008,9 @@ select.fctrl { cursor: pointer; }
   transform-style: preserve-3d;
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Faster, smoother transition */
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 5);
-}
-/* [NEW] Flexbox layout for detail card */
-.tinder-card {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Ensure it takes full height of its container */
+  height: 100%;
 }
 
 /* [NEW] Enhanced scrollable area with fading effect */
@@ -1579,11 +1503,20 @@ select.fctrl { cursor: pointer; }
     right: 20px; /* เว้นระยะห่างจากขอบขวา */
     transform: none; /* ยกเลิกการ transform เพื่อให้แสดงผลตามตำแหน่งที่กำหนด */
   }
-}
-/* ==========================================================================
-   ── ✅ Status Badge — ใช้ใน notification/tracking modal
-   ========================================================================== */
 
+    /* [NEW] Adjust tinder-card content for mobile */
+    body.plan-detail-is-active .plan-container.is-active .tinder-card {
+        display: flex; /* กำหนดให้ใช้ Flexbox layout สำหรับจัดเรียงองค์ประกอบภายใน */
+        flex-direction: column; /* จัดเรียงองค์ประกอบภายใน (header, content, footer) เป็นแนวตั้ง */
+        height: 100%; /* ทำให้การ์ดมีความสูงเต็ม 100% ของพื้นที่ container */
+    }
+    body.plan-detail-is-active .plan-container.is-active .tc-header { padding: 15px 20px; } /* ลดระยะห่างภายในของส่วนหัวการ์ด */
+    body.plan-detail-is-active .plan-container.is-active .tc-header .tc-plan-name { font-size: 14px; } /* ลดขนาดตัวอักษรของชื่อแผน */
+    body.plan-detail-is-active .plan-container.is-active .tc-table-scroll { flex: 1; } /* ทำให้ส่วนเนื้อหาที่เลื่อนได้ (ตาราง) ขยายเต็มพื้นที่ที่เหลือ */
+    .tc-footer { padding: 10px 20px; font-size: 10px; } /* ลดระยะห่างและขนาดตัวอักษรของส่วนท้าย */
+    .tinder-counter { top: 18px; left: 20px; } /* ปรับตำแหน่งตัวนับการ์ด */
+    .detail-close-btn { top: 15px; right: 15px; width: 32px; height: 32px; font-size: 18px; } /* ปรับขนาดและตำแหน่งปุ่มปิด */
+}
 /* ==========================================================================
    ── [MOVED & REFACTORED] User Page Specific Styles
    ========================================================================== */
@@ -2050,22 +1983,65 @@ select.fctrl { cursor: pointer; }
       top: 10px; right: 10px;
     }
 
-    /* [NEW] Adjust tinder-card content for mobile */
-    body.plan-detail-is-active .plan-container.is-active .tinder-card {
-        display: flex; /* กำหนดให้ใช้ Flexbox layout สำหรับจัดเรียงองค์ประกอบภายใน */
-        flex-direction: column; /* จัดเรียงองค์ประกอบภายใน (header, content, footer) เป็นแนวตั้ง */
-        height: 100%; /* ทำให้การ์ดมีความสูงเต็ม 100% ของพื้นที่ container */
-    }
-    body.plan-detail-is-active .plan-container.is-active .tc-header { padding: 15px 20px; } /* ลดระยะห่างภายในของส่วนหัวการ์ด */
-    body.plan-detail-is-active .plan-container.is-active .tc-header .tc-plan-name { font-size: 14px; } /* ลดขนาดตัวอักษรของชื่อแผน */
-    body.plan-detail-is-active .plan-container.is-active .tc-table-scroll { flex: 1; } /* ทำให้ส่วนเนื้อหาที่เลื่อนได้ (ตาราง) ขยายเต็มพื้นที่ที่เหลือ */
-    .tc-footer { padding: 10px 20px; font-size: 10px; } /* ลดระยะห่างและขนาดตัวอักษรของส่วนท้าย */
-    .tinder-counter { top: 18px; left: 20px; } /* ปรับตำแหน่งตัวนับการ์ด */
-    .detail-close-btn { top: 15px; right: 15px; width: 32px; height: 32px; font-size: 18px; } /* ปรับขนาดและตำแหน่งปุ่มปิด */
-
     .chatbot { right: 15px; bottom: 85px; width: calc(100% - 30px); }
     .chatbot-toggler { right: 15px; bottom: 20px; width: 60px; height: 60px; }
     .chatbot-toggler img { width: 70px; height: 70px; }
+  }
+
+  /* ==========================================================================
+     ── [MOVED] Chatbot Styles
+     ========================================================================== */
+  .chatbot-toggler {
+    position: fixed;
+    bottom: 30px;
+    right: 35px;
+    outline: none;
+    border: none;
+    height: 80px;
+    width: 80px;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent);
+    transition: all 0.2s ease;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  body.show-chatbot .chatbot-toggler {
+    transform: rotate(90deg);
+  }
+  .chatbot-toggler span {
+    color: #fff;
+    font-size: 2rem;
+  }
+  .chatbot-toggler img {
+    width: 90px;
+    height: 90px;
+    transition: transform 0.2s ease;
+    transform: scale(1);
+  }
+  .chatbot {
+    position: fixed;
+    right: 35px;
+    bottom: 100px;
+    width: 420px;
+    background: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.5);
+    transform-origin: bottom right;
+    box-shadow: 0 0 128px 0 rgba(0,0,0,0.1), 0 32px 64px -48px rgba(0,0,0,0.5);
+    transition: all 0.1s ease;
+    z-index: 1000;
+  }
+  body.show-chatbot .chatbot {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
   }
 
   @media (max-width: 600px) {
