@@ -342,22 +342,84 @@ body {
 .qb-btn:hover { transform: translateX(-4px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); background: #334155; }
 .qb-btn i { font-size: 16px; }
 
+/* ==========================================================================
+   ── [FIX] Detail Modal Mobile Responsiveness
+   ========================================================================== */
 @media (max-width: 480px) {
-    .qb-btn span { display: none; }
-    .qb-btn { padding: 12px; border-radius: 50%; width: 44px; height: 44px; justify-content: center; }
-    .fixed-actions-bar .btn-h span { display: none; } /* ซ่อนข้อความในปุ่มบนมือถือ */
 
-    /* ปรับแต่งปุ่ม Floating ใน hdr-actions ให้เป็นวงกลม */
-    .fixed-actions-bar .hdr-actions { gap: 10px; } /* ปรับ gap บนมือถือ */
-    .fixed-actions-bar .hdr-actions .btn-h {
-        width: 54px; /* เพิ่มขนาดปุ่มบนมือถือ */
-        height: 54px; /* เพิ่มขนาดปุ่มบนมือถือ */
-        border-radius: 50%;
-        padding: 0;
-        justify-content: center;
-    }
-    .fixed-actions-bar .hdr-actions .btn-h i { font-size: 24px; } /* เพิ่มขนาดไอคอนบนมือถือ */
-    .hdr-group { gap: 8px; }
+  /* [FIX] Header: จัดเป็น 2 แถว ไม่ให้ล้น */
+  #detailModal .m-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 14px;
+    align-items: flex-start;
+  }
+
+  #detailModal .m-header h2 {
+    font-size: 13px;
+    flex: 1 1 100%; /* [FIX] ให้ title ครองแถวเต็มก่อน */
+    line-height: 1.4;
+  }
+
+  /* [FIX] ซ่อน label "ไฮไลต์ความต่าง" เหลือแค่ checkbox */
+  #detailModal .m-header label span {
+    display: none;
+  }
+
+  /* [FIX] ตาราง: ให้ scroll แนวนอนได้ */
+  #detailModal .m-body {
+    padding: 0;
+    overflow-x: auto;
+  }
+
+  #detailModal #modal-table-area {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #detailModal table {
+    min-width: 480px; /* [FIX] กำหนด min-width ให้ scroll แนวนอน */
+    table-layout: auto !important;
+  }
+
+  /* [FIX] Column หัวข้อ: ลดความกว้าง */
+  #detailModal table .topic-header,
+  #detailModal table td:first-child {
+    width: 140px !important;
+    min-width: 140px !important;
+    font-size: 12px;
+    padding: 10px 12px !important;
+  }
+
+  /* [FIX] Column บริษัท: ลดขนาด */
+  #detailModal table th:not(.topic-header),
+  #detailModal table td:not(:first-child) {
+    min-width: 130px;
+    font-size: 11px;
+    padding: 10px 8px !important;
+  }
+
+  /* [FIX] Logo ในหัวตาราง: ลดขนาด */
+  #detailModal table th img {
+    max-height: 40px !important;
+    max-width: 90px !important;
+  }
+
+  #detailModal table th {
+    height: auto !important;
+    padding: 10px 8px !important;
+  }
+
+  /* [FIX] Footer ปุ่ม: stack บนมือถือ */
+  #detailModal .m-footer {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 14px;
+  }
+  #detailModal .m-footer button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* ==========================================================================
@@ -1470,52 +1532,48 @@ select.fctrl { cursor: pointer; }
 /* ==========================================================================
    ── [NEW] Mobile Responsiveness for Tinder Card Detail
    ========================================================================== */
+/* [FIX] ให้ plan-container ที่ active กลายเป็น fixed overlay เต็มจอ */
 @media (max-width: 768px) {
-  /* เมื่อการ์ดรายละเอียดถูกเปิด, ทำให้ container ของมันกลายเป็น overlay เต็มหน้าจอ */
   body.plan-detail-is-active .plan-container.is-active {
-    position: fixed; /* ยึดตำแหน่งไว้กับหน้าจอ ไม่ให้เลื่อนตาม */
-    inset: 0; /* ขยายเต็มทุกด้าน (top, right, bottom, left = 0) */
+    position: fixed;
+    inset: 0;
     width: 100%;
     height: 100%;
-    z-index: 1000; /* ให้แสดงอยู่ชั้นบนสุด */
+    z-index: 1000;
     margin: 0;
+    border-radius: 0;   /* [FIX] เพิ่ม: ตัด border-radius ออก ไม่งั้นมีช่องว่างมุม */
   }
 
-  /* ทำให้พื้นที่แสดงรายละเอียด (ที่เคยเป็น hover) ขยายเต็ม container ที่เป็น fixed */
+  /* [FIX] plan-detail-hover ต้องเป็น fixed ด้วย ไม่ใช่ absolute */
   body.plan-detail-is-active .plan-container.is-active .plan-detail-hover {
-    inset: 0; /* ขยายเต็มทุกด้าน */
+    position: fixed;    /* [FIX] เปลี่ยนจาก absolute → fixed */
+    inset: 0;
+    width: 100%;
+    height: 100%;
     padding: 0;
+    border-radius: 0;   /* [FIX] ตัดโค้งมุมออก */
+    overflow-y: auto;
   }
 
-  /* ปรับการ์ด tinder-card ให้แสดงผลแบบเต็มหน้าจอ */
+  /* [FIX] การ์ดข้างในต้องเต็มความสูงด้วย */
   body.plan-detail-is-active .plan-container.is-active .tinder-card {
-    border-radius: 0; /* ทำให้ขอบของการ์ดไม่โค้งมน (เป็นสี่เหลี่ยม) เพื่อให้เต็มจอพอดี */
-    box-shadow: none; /* เอากล่องเงาออก เพราะการ์ดจะเต็มจอแล้ว */
-    border: none; /* เอาเส้นขอบออก */
-    transform: none !important; /* ยกเลิกการ transform (เช่น การขยายเมื่อ hover) เพื่อให้การ์ดแสดงผลนิ่งๆ */
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    transform: none !important;
+    min-height: 100%;   /* [FIX] เพิ่ม: ให้การ์ดยืดเต็มความสูง */
+    height: 100%;
   }
 
-  /* ย้ายตำแหน่งปุ่มเลื่อนซ้าย-ขวาของการ์ด */
   body.plan-detail-is-active .plan-container.is-active .tinder-nav {
-    top: auto; /* ยกเลิกการจัดตำแหน่งบน */
-    bottom: 20px; /* จัดตำแหน่งปุ่มไว้ด้านล่างของหน้าจอ */
-    left: 20px; /* เว้นระยะห่างจากขอบซ้าย */
-    right: 20px; /* เว้นระยะห่างจากขอบขวา */
-    transform: none; /* ยกเลิกการ transform เพื่อให้แสดงผลตามตำแหน่งที่กำหนด */
+    position: fixed;    /* [FIX] เปลี่ยนเป็น fixed ให้ลอยอยู่เสมอ */
+    top: auto;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    transform: none;
+    z-index: 1010;      /* [FIX] ให้อยู่เหนือการ์ด */
   }
-
-    /* ปรับ layout ภายใน tinder-card สำหรับมือถือ */
-    body.plan-detail-is-active .plan-container.is-active .tinder-card {
-        display: flex; /* กำหนดให้ใช้ Flexbox layout สำหรับจัดเรียงองค์ประกอบภายใน */
-        flex-direction: column; /* จัดเรียงองค์ประกอบภายใน (header, content, footer) เป็นแนวตั้ง */
-        height: 100%; /* ทำให้การ์ดมีความสูงเต็ม 100% ของพื้นที่ container */
-    }
-    body.plan-detail-is-active .plan-container.is-active .tc-header { padding: 15px 20px; } /* ลด padding ของส่วนหัวการ์ด */
-    body.plan-detail-is-active .plan-container.is-active .tc-header .tc-plan-name { font-size: 14px; } /* ลดขนาดตัวอักษรชื่อแผน */
-    body.plan-detail-is-active .plan-container.is-active .tc-table-scroll { flex: 1; } /* ทำให้ส่วนเนื้อหาที่เลื่อนได้ (ตาราง) ขยายเต็มพื้นที่ที่เหลือ */
-    .tc-footer { padding: 10px 20px; font-size: 10px; } /* ลด padding และขนาดตัวอักษรของส่วนท้าย */
-    .tinder-counter { top: 18px; left: 20px; } /* ปรับตำแหน่งตัวนับเลขหน้าของการ์ด */
-    .detail-close-btn { top: 15px; right: 15px; width: 32px; height: 32px; font-size: 18px; } /* ปรับขนาดและตำแหน่งปุ่มปิด (X) */
 }
 /* ==========================================================================
    ── [MOVED & REFACTORED] User Page Specific Styles
