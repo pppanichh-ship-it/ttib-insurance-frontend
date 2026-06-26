@@ -1471,7 +1471,8 @@ select.fctrl { cursor: pointer; }
    ── [NEW] Mobile Responsiveness for Tinder Card Detail
    ========================================================================== */
 @media (max-width: 768px) {
-  /* When a plan detail is active, make its container a full-screen overlay */
+
+  /* Full-screen overlay for active plan container */
   body.plan-detail-is-active .plan-container.is-active {
     position: fixed;
     inset: 0;
@@ -1479,43 +1480,67 @@ select.fctrl { cursor: pointer; }
     height: 100%;
     z-index: 1000;
     margin: 0;
+    overflow: hidden; /* [FIX] ป้องกัน content ล้น */
   }
 
-  /* Ensure the hover/detail area fills the new fixed container */
+  /* Fill the fixed container */
   body.plan-detail-is-active .plan-container.is-active .plan-detail-hover {
+    position: absolute; /* [FIX] ต้องมี position ถึงจะใช้ inset ได้ */
     inset: 0;
     padding: 0;
   }
 
-  /* Adjust the card itself for full-screen view */
+  /* [FIX] Merged .tinder-card rules เป็น block เดียว */
   body.plan-detail-is-active .plan-container.is-active .tinder-card {
-    border-radius: 0; /* ทำให้ขอบของการ์ดไม่โค้งมน (เป็นสี่เหลี่ยม) เพื่อให้เต็มจอพอดี */
-    box-shadow: none; /* เอากล่องเงาออก เพราะการ์ดจะเต็มจอแล้ว */
-    border: none; /* เอาเส้นขอบออก */
-    transform: none !important; /* ยกเลิกการ transform (เช่น การขยายเมื่อ hover) เพื่อให้การ์ดแสดงผลนิ่งๆ */
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    transform: none !important;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
 
-  /* Reposition navigation buttons for mobile */
+  /* Navigation buttons at bottom */
   body.plan-detail-is-active .plan-container.is-active .tinder-nav {
-    top: auto; /* ยกเลิกการจัดตำแหน่งบน */
-    bottom: 20px; /* จัดตำแหน่งปุ่มไว้ด้านล่างของหน้าจอ */
-    left: 20px; /* เว้นระยะห่างจากขอบซ้าย */
-    right: 20px; /* เว้นระยะห่างจากขอบขวา */
-    transform: none; /* ยกเลิกการ transform เพื่อให้แสดงผลตามตำแหน่งที่กำหนด */
+    top: auto;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    transform: none;
   }
 
-    /* [NEW] Adjust tinder-card content for mobile */
-    body.plan-detail-is-active .plan-container.is-active .tinder-card {
-        display: flex; /* กำหนดให้ใช้ Flexbox layout สำหรับจัดเรียงองค์ประกอบภายใน */
-        flex-direction: column; /* จัดเรียงองค์ประกอบภายใน (header, content, footer) เป็นแนวตั้ง */
-        height: 100%; /* ทำให้การ์ดมีความสูงเต็ม 100% ของพื้นที่ container */
-    }
-    body.plan-detail-is-active .plan-container.is-active .tc-header { padding: 15px 20px; } /* ลดระยะห่างภายในของส่วนหัวการ์ด */
-    body.plan-detail-is-active .plan-container.is-active .tc-header .tc-plan-name { font-size: 14px; } /* ลดขนาดตัวอักษรของชื่อแผน */
-    body.plan-detail-is-active .plan-container.is-active .tc-table-scroll { flex: 1; } /* ทำให้ส่วนเนื้อหาที่เลื่อนได้ (ตาราง) ขยายเต็มพื้นที่ที่เหลือ */
-    .tc-footer { padding: 10px 20px; font-size: 10px; } /* ลดระยะห่างและขนาดตัวอักษรของส่วนท้าย */
-    .tinder-counter { top: 18px; left: 20px; } /* ปรับตำแหน่งตัวนับการ์ด */
-    .detail-close-btn { top: 15px; right: 15px; width: 32px; height: 32px; font-size: 18px; } /* ปรับขนาดและตำแหน่งปุ่มปิด */
+  body.plan-detail-is-active .plan-container.is-active .tc-header {
+    padding: 15px 20px;
+  }
+
+  body.plan-detail-is-active .plan-container.is-active .tc-header .tc-plan-name {
+    font-size: 14px;
+  }
+
+  body.plan-detail-is-active .plan-container.is-active .tc-table-scroll {
+    flex: 1;
+    overflow-y: auto; /* [FIX] ให้ scroll ได้จริง */
+  }
+
+  /* [FIX] เพิ่ม scope selector ให้ครบ ป้องกัน override นอก context */
+  body.plan-detail-is-active .plan-container.is-active .tc-footer {
+    padding: 10px 20px;
+    font-size: 10px;
+  }
+
+  body.plan-detail-is-active .plan-container.is-active .tinder-counter {
+    top: 18px;
+    left: 20px;
+  }
+
+  body.plan-detail-is-active .plan-container.is-active .detail-close-btn {
+    top: 15px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
 }
 /* ==========================================================================
    ── [MOVED & REFACTORED] User Page Specific Styles
