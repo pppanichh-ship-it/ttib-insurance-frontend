@@ -605,16 +605,28 @@ function clearSearchBiz() {
   const bizSel      = document.getElementById('sel-biz');
   const clearBtn    = document.getElementById('btn-clear-biz');
   const suggestionsBox = document.querySelector('.biz-suggestions');
+  // [FIX] เพิ่ม reset sum
+  const sumInput    = document.getElementById('inp-sum');
+  const btnMinus    = document.getElementById('btn-sum-minus');
+  const btnPlus     = document.getElementById('btn-sum-plus');
+  const MIN_SUM     = 500000;
 
   if (searchInput) {
     searchInput.value = '';
     if (bizSel) bizSel.value = '';
     if (suggestionsBox) suggestionsBox.classList.remove('show');
     if (clearBtn) clearBtn.classList.remove('show');
+
+    // [FIX] รีเซ็ต sum กลับ 500,000
+    if (sumInput) {
+      sumInput.value = MIN_SUM.toLocaleString('th-TH');
+      if (btnMinus) btnMinus.disabled = true;  // 500k = min → ปิดปุ่ม -
+      if (btnPlus)  btnPlus.disabled  = false;
+    }
+
     resetNotFoundBtn();
     window.companyCardIndexes = {};
-
-    render(); // ✅ ลบ searchInput.focus() ออกเพื่อไม่ให้ dropdown โผล่กลับมา
+    render();
   }
 }
 
@@ -856,35 +868,29 @@ function render() {
   const selectedBiz = bizSel.value;
   const normBiz     = normalize(selectedBiz);
   const selectedSum = sumInput ? (Number(String(sumInput.value).replace(/,/g, ''))||0) : 0;
-  const covFilter   = covSel ? covSel.value : 'all';
+  const sortBy      = covSel ? covSel.value : 'coverage'; // [FIX] เปลี่ยนค่าเริ่มต้นเป็น 'coverage'
 
   let validPlans = allBusinessMappings.filter(m => normalize(m.business) === normBiz);
-  if (covFilter === 'ar') validPlans = validPlans.filter(p => { const ct = String(p.covType || '').toLowerCase(); return ct.includes('ประกันแบบเสี่ยงภัยทุกชนิด (all risk)'); });
-  if (covFilter === 'fp') validPlans = validPlans.filter(p => { const ct = String(p.covType || '').toLowerCase(); return ct.includes('ประกันแบบระบุภัย (named perils)'); });
 
   const currentPremiums = [];
   validPlans.forEach(plan => {
     currentPremiums.push(premiumDatabase[selectedSum]?.[plan.searchKey]??0);
   });
 
-  // [CHANGE] ตั้งค่าการเรียงตามเบี้ยประกันเป็นค่าเริ่มต้นเสมอ
-  const sortBy  = 'premium';
   let indices   = validPlans.map((_,i)=>i);
-  if (sortBy==='coverage') {
+  if (sortBy === 'coverage') {
     indices.sort((a, b) => {
       const countA = markDatabase[validPlans[a].searchKey] || 0;
       const countB = markDatabase[validPlans[b].searchKey] || 0;
-      return countB - countA;
+      return countB - countA; // เรียงจากมากไปน้อย
     });
-  } else if (sortBy==='company') {
-    indices.sort((a,b)=>validPlans[a].company.localeCompare(validPlans[b].company));
-  } else if (sortBy === 'premium') {
+  } else if (sortBy === 'prem-asc' || sortBy === 'prem-desc') {
     indices.sort((a, b) => {
       const premA = currentPremiums[a] || 0;
       const premB = currentPremiums[b] || 0;
       if (premA === 0 && premB > 0) return 1;  // แผนที่ไม่มีราคา (ติดต่อเจ้าหน้าที่) ไปอยู่ท้ายสุด
       if (premB === 0 && premA > 0) return -1;
-      return premA - premB; // เรียงจากน้อยไปมาก
+      return sortBy === 'prem-asc' ? premA - premB : premB - premA;
     });
   }
 
@@ -905,7 +911,6 @@ function render() {
   }
   renderTinderUI(sortedPlans, sortedPremiums, selectedSum, selectedBiz);
 }
-
 /**
  * [NEW] _renderEmptyState - แสดงผลเมื่อยังไม่ได้เลือกธุรกิจ
  * แยกโค้ดส่วนนี้ออกมาเพื่อให้ฟังก์ชัน render() หลักกระชับขึ้น
