@@ -911,6 +911,7 @@ function render() {
   }
   renderTinderUI(sortedPlans, sortedPremiums, selectedSum, selectedBiz);
 }
+
 /**
  * [NEW] _renderEmptyState - แสดงผลเมื่อยังไม่ได้เลือกธุรกิจ
  * แยกโค้ดส่วนนี้ออกมาเพื่อให้ฟังก์ชัน render() หลักกระชับขึ้น
@@ -949,86 +950,190 @@ function renderTinderUI(plans, premiums, sumInsured = 0, businessName = '') {
   if (!container) return;
   if (!plans || !plans.length) {
     container.innerHTML = '<div class="no-result">🔍 ไม่พบแผนประกัน</div>';
-    window.activeMultiCards = []; // This line is not dead code, it's used.
+    window.activeMultiCards = [];
     return;
   }
+
   window.currentPlans    = plans;
   window.currentPremiums = premiums;
 
+  // ── จัดกลุ่มแผนตามบริษัท ──────────────────────────────────────────────────
   const companyGroups = {};
   plans.forEach((plan, idx) => {
     const compKey = plan.company ? String(plan.company).trim().toUpperCase() : 'UNKNOWN';
     if (!companyGroups[compKey]) companyGroups[compKey] = [];
     companyGroups[compKey].push({ plan, premium: premiums[idx], globalIdx: idx });
   });
+
   Object.keys(companyGroups).forEach(comp => {
     const len = companyGroups[comp].length;
     if (window.companyCardIndexes[comp] === undefined) window.companyCardIndexes[comp] = 0;
     else window.companyCardIndexes[comp] = Math.max(0, Math.min(window.companyCardIndexes[comp], len - 1));
   });
-  window.activeMultiCards = [];
 
-  const isInitialRender = !container.querySelector('.multi-tinder-grid');
-  let html = '';
+  // ── ลำดับบริษัทใหม่ตาม sorted plans ─────────────────────────────────────
+  const newOrder = Object.keys(companyGroups);
 
-  if (isInitialRender) {
-    html += '<div class="multi-tinder-grid" style="display:flex;flex-wrap:wrap;gap:30px;justify-content:center;align-items:flex-start;width:100%;padding:10px 0;">';
+  // ── ตรวจว่าต้อง rebuild หรือแค่ animate ──────────────────────────────────
+  const gridEl = container.querySelector('.multi-tinder-grid');
+  let needRebuild = !gridEl;
+
+  if (!needRebuild && gridEl) {
+    const existingCards = [...gridEl.querySelectorAll('[id^="plan-card-"]')];
+    const existingOrder = existingCards.map(el =>
+      el.id.replace('plan-card-', '').toUpperCase()
+    );
+    const newOrderNorm = newOrder.map(comp =>
+      comp.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
+    );
+
+    if (existingOrder.length !== newOrderNorm.length) {
+      needRebuild = true;
+    } else {
+      needRebuild = newOrderNorm.some((comp, i) => comp !== existingOrder[i]);
+    }
   }
 
-  Object.keys(companyGroups).forEach(comp => {
-    const group      = companyGroups[comp];
-    const curIdx     = window.companyCardIndexes[comp];
-    const item       = group[curIdx];
+  // ══════════════════════════════════════════════════════════════════════════
+  // PATH A: Rebuild พร้อม animation
+  // ══════════════════════════════════════════════════════════════════════════
+  if (needRebuild) {
+    window.activeMultiCards = [];
+
+    // [ANIM] ถ้ามี grid เดิม → fade out ก่อน แล้วค่อย rebuild
+    if (gridEl) {
+      gridEl.classList.add('is-transitioning');
+
+      // [ANIM] ใส่ is-leaving ให้การ์ดทุกใบเพื่อ play out animation
+      const oldCards = gridEl.querySelectorAll('.plan-container');
+      oldCards.forEach((card, i) => {
+        card.style.animationDelay = `${i * 0.04}s`;
+        card.classList.add('is-leaving');
+      });
+
+      // รอให้ animation out เสร็จก่อน inject ใหม่
+      const LEAVE_DURATION = 220 + (oldCards.length * 40); // ms
+      setTimeout(() => {
+        _doRebuildGrid(container, newOrder, companyGroups, sumInsured, businessName);
+      }, LEAVE_DURATION);
+
+    } else {
+      // ไม่มี grid เดิม → inject ทันที (initial load)
+      _doRebuildGrid(container, newOrder, companyGroups, sumInsured, businessName);
+    }
+    return;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // PATH B: Animate only — order เดิม แค่ตัวเลขเปลี่ยน
+  // ══════════════════════════════════════════════════════════════════════════
+  window.activeMultiCards = [];
+
+  newOrder.forEach(comp => {
+    const group  = companyGroups[comp];
+    const curIdx = window.companyCardIndexes[comp];
+    const item   = group[curIdx];
     window.activeMultiCards.push(item);
-    const plan       = item.plan;
-    const price      = Number(item.premium) || 0;
-    const cColor     = COMPANY_COLORS[plan.company.toUpperCase()] || "#4258d3";
-    const cLogo      = COMPANY_LOGOS[plan.company.toUpperCase()];
-    const compEscaped = comp.replace(/'/g, "\\'");
-    const cardId     = `plan-card-${comp.replace(/[^a-zA-Z0-9]/g, '')}`;
-  const isFavorited = favoritePlans.some(p => normalizeKey(p.company, p.plan, p.group) === normalizeKey(plan.company, plan.plan, plan.group));
 
-    if (!isInitialRender) {
-      const cardEl = document.getElementById(cardId);
-      if (cardEl) {
-        // การ์ดมีอยู่แล้ว → animate ค่าใหม่
-      // [FAV] อัปเดตสถานะหัวใจ
-      const heartCheckbox = cardEl.querySelector('.plan-summary .container input');
-      if (heartCheckbox && heartCheckbox.checked !== isFavorited) {
-        heartCheckbox.checked = isFavorited;
-      }
-      // [FAV] อัปเดต data attributes
-      const heartLabel = cardEl.querySelector('.plan-summary .container');
-      if (heartLabel) {
-        heartLabel.dataset.sum = sumInsured;
-        heartLabel.dataset.premium = price;
-      }
+    const plan   = item.plan;
+    const price  = Number(item.premium) || 0;
+    const cardId = `plan-card-${comp.replace(/[^a-zA-Z0-9]/g, '')}`;
 
-        const sumEl   = cardEl.querySelector('.sum-insured-value');
-        const priceEl = cardEl.querySelector('.premium-value-main');
-        const oldSum   = Number(sumEl?.dataset.value   || '0');
-        const oldPrice = Number(priceEl?.dataset.value || '0');
-        if (sumEl)   { animateValue(sumEl,   oldSum,   sumInsured); sumEl.dataset.value   = sumInsured; } // [FIX] guard ก่อน set
-        if (priceEl) { animateValue(priceEl, oldPrice, price);      priceEl.dataset.value = price;      } // [FIX] guard ก่อน set
-        return;
-      }
-      // [FIX] การ์ดหายจาก DOM → rebuild แล้ว inject เข้า grid โดยตรง
-      const gridEl = container.querySelector('.multi-tinder-grid');
+    const cardEl = document.getElementById(cardId);
+    if (!cardEl) {
+      // การ์ดหายจาก DOM → inject ใหม่
+      const cColor      = COMPANY_COLORS[plan.company.toUpperCase()] || "#4258d3";
+      const cLogo       = COMPANY_LOGOS[plan.company.toUpperCase()];
+      const compEscaped = comp.replace(/'/g, "\\'");
       if (gridEl) {
         gridEl.insertAdjacentHTML('beforeend',
-          buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, compEscaped, curIdx, group.length, businessName)
+          buildTinderCardHTML(
+            cardId, plan, price, sumInsured,
+            cColor, cLogo, compEscaped,
+            curIdx, group.length, businessName
+          )
         );
       }
       return;
     }
 
-    html += buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, compEscaped, curIdx, group.length, businessName);
+    // อัปเดต favorite checkbox
+    const isFavorited = favoritePlans.some(p =>
+      normalizeKey(p.company, p.plan, p.group) === normalizeKey(plan.company, plan.plan, plan.group)
+    );
+    const heartCheckbox = cardEl.querySelector('.plan-summary .container input');
+    if (heartCheckbox && heartCheckbox.checked !== isFavorited) heartCheckbox.checked = isFavorited;
+    const heartLabel = cardEl.querySelector('.plan-summary .container');
+    if (heartLabel) {
+      heartLabel.dataset.sum     = sumInsured;
+      heartLabel.dataset.premium = price;
+    }
+
+    // [ANIM] pulse การ์ดเบาๆ เมื่อค่าตัวเลขเปลี่ยน
+    const sumEl   = cardEl.querySelector('.sum-insured-value');
+    const priceEl = cardEl.querySelector('.premium-value-main');
+    const oldSum   = Number(sumEl?.dataset.value   || '0');
+    const oldPrice = Number(priceEl?.dataset.value || '0');
+
+    const valuesChanged = oldSum !== sumInsured || oldPrice !== price;
+    if (valuesChanged) {
+      _pulseCard(cardEl);
+    }
+
+    if (sumEl)   { animateValue(sumEl,   oldSum,   sumInsured); sumEl.dataset.value   = sumInsured; }
+    if (priceEl) { animateValue(priceEl, oldPrice, price);      priceEl.dataset.value = price; }
+  });
+}
+
+// =============================================================================
+// HELPERS (animation)
+// =============================================================================
+
+/**
+ * inject grid ใหม่ทั้งหมดพร้อม stagger animation
+ */
+function _doRebuildGrid(container, newOrder, companyGroups, sumInsured, businessName) {
+  window.activeMultiCards = [];
+
+  let html = `<div class="multi-tinder-grid" style="display:flex;flex-wrap:wrap;gap:30px;justify-content:center;align-items:flex-start;width:100%;padding:10px 0;">`;
+
+  newOrder.forEach(comp => {
+    const group      = companyGroups[comp];
+    const curIdx     = window.companyCardIndexes[comp];
+    const item       = group[curIdx];
+    window.activeMultiCards.push(item);
+
+    const plan        = item.plan;
+    const price       = Number(item.premium) || 0;
+    const cColor      = COMPANY_COLORS[plan.company.toUpperCase()] || "#4258d3";
+    const cLogo       = COMPANY_LOGOS[plan.company.toUpperCase()];
+    const compEscaped = comp.replace(/'/g, "\\'");
+    const cardId      = `plan-card-${comp.replace(/[^a-zA-Z0-9]/g, '')}`;
+
+    html += buildTinderCardHTML(
+      cardId, plan, price, sumInsured,
+      cColor, cLogo, compEscaped,
+      curIdx, group.length, businessName
+    );
   });
 
-  if (isInitialRender) {
-    html += '</div>';
-    container.innerHTML = html; // This line is not dead code, it's used.
-  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+/**
+ * [ANIM] pulse การ์ดเบาๆ เมื่อค่าตัวเลขอัปเดต (PATH B)
+ */
+function _pulseCard(cardEl) {
+  // ลบ class เก่าก่อน (กรณี pulse ซ้ำเร็วๆ)
+  cardEl.classList.remove('is-value-updated');
+  // force reflow เพื่อให้ animation restart
+  void cardEl.offsetWidth;
+  cardEl.classList.add('is-value-updated');
+  // ถอด class หลัง animation จบ
+  cardEl.addEventListener('animationend', () => {
+    cardEl.classList.remove('is-value-updated');
+  }, { once: true });
 }
 function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, compEscaped, curIdx, groupLength, businessName) {
   // ── สร้างส่วนแสดงผลรายละเอียด (ที่จะซ่อนไว้) ──
@@ -1117,35 +1222,35 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
             <span>สนใจทำประกันภัย</span>
           </button>
       </article>
-      <div class="plan-detail-hover">
-        <div class="tinder-nav">
-          <button class="tinder-nav-btn tinder-btn-prev" onclick="moveCompanyCard('${compEscaped}',-1, event)" ${curIdx === 0 ? 'disabled' : ''}>&#8249;</button>
-          <button class="tinder-nav-btn tinder-btn-next" onclick="moveCompanyCard('${compEscaped}',1, event)" ${curIdx === groupLength - 1 ? 'disabled' : ''}>&#8250;</button>
-        </div>
+    <div class="plan-detail-hover">
         <div class="tinder-card">
-          <button class="detail-close-btn" onclick="togglePlanDetail(this, false)" title="ปิด"><i class="ti ti-x"></i></button>
-          <div class="tinder-counter">${curIdx + 1} / ${groupLength}</div>
+          <div class="tc-grabber"><span></span></div>
           <div class="tc-header">
-            <div class="tc-company-name">${escapeHtml(plan.company)}</div>
-            <div class="tc-plan-name">${escapeHtml(plan.plan)}</div>
-            ${plan.group ? `<div class="tc-group-name">กลุ่ม: ${escapeHtml(plan.group)}</div>` : ''}
+            <button class="detail-close-btn" onclick="togglePlanDetail(this, false)" title="ปิด"><i class="ti ti-x"></i></button>
+            <div class="tc-plan-name">${escapeHtml(plan.plan) || 'ชื่อแผนประกัน'}</div>
+            <div class="tc-company-name">${escapeHtml(plan.company)}${plan.group ? ` &middot; ${escapeHtml(plan.group)}` : ''}</div>
+            ${groupLength > 1 ? `<div class="tinder-counter">${curIdx + 1} / ${groupLength}</div>` : ''}
           </div>
-          <div class="cov-section-title">รายการที่คุ้มครอง</div>
+          <div class="tc-section-title">รายการความคุ้มครอง</div>
           <div class="tc-table-scroll">
             ${detailHtml || '<div class="no-cov-data">ไม่มีข้อมูลความคุ้มครอง</div>'}
           </div>
           <div class="tc-footer">
+            <button class="tinder-nav-btn tinder-btn-prev" onclick="moveCompanyCard('${compEscaped}',-1, event)" ${curIdx === 0 ? 'disabled' : ''} title="แผนก่อนหน้า">&#8249;</button>
             <button class="btn-h" onclick="openDetailModal()">
               <i class="ti ti-clipboard-list"></i>
-                <span>รายละเอียด</span>
+              <span>ดูรายละเอียดเต็ม</span>
             </button>
+            <button class="tinder-nav-btn tinder-btn-next" onclick="moveCompanyCard('${compEscaped}',1, event)" ${curIdx === groupLength - 1 ? 'disabled' : ''} title="แผนถัดไป">&#8250;</button>
           </div>
         </div>
       </div>
       <div class="plan-detail-overlay" onclick="togglePlanDetail(this, false)"></div>
+
     </div>`;
 }
 
+      
 /**
  * [NEW] Toggles the detail view for a plan card.
  * @param {HTMLElement} el 
@@ -1444,12 +1549,12 @@ function openFavoritesModal() {
     </div>`;
 
   if (favoritePlans.length === 0) {
-    contentHtml += `<div style="text-align:center; padding:80px 20px; background:#fff;">
-      <div style="width:120px; height:120px; background:#f1f5f9; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 25px;">
-        <i class="ti ti-heart-broken" style="font-size:56px; color:#cbd5e1;"></i>
+    contentHtml += `<div class="fav-empty-state">
+      <div class="fav-empty-icon">
+        <i class="ti ti-bookmark-off"></i>
       </div>
-      <p style="font-size:16px; color:#475569; font-weight:700;">ยังไม่มีแผนประกันที่บันทึกไว้</p>
-      <p style="font-size:13px; color:#94a3b8; max-width:320px; margin:8px auto 0; line-height:1.6;">
+      <p class="fav-empty-title">ยังไม่มีแผนประกันที่บันทึกไว้</p>
+      <p class="fav-empty-desc">
         กดที่รูปหัวใจ <i class="ti ti-heart"></i> บนการ์ดแผนประกันเพื่อบันทึกแผนที่สนใจไว้ดูภายหลัง
       </p>
     </div>`;
@@ -1461,29 +1566,31 @@ function openFavoritesModal() {
       const isChecked = favoritePlans.some(p => normalizeKey(p.company, p.plan, p.group) === planId);
 
       return `
-        <div class="plan-summary fav-card" style="--brand-color: ${cColor}; width:100%; max-width:420px; margin:0 auto;">
-          <label class="container" onclick="toggleFavorite(this); this.parentElement.remove(); event.stopPropagation()"
-            data-business="${escapeHtml(item.business || '')}"
-            data-company="${escapeHtml(item.company)}" data-plan="${escapeHtml(item.plan)}" data-group="${escapeHtml(item.group || '')}"
-            data-covtype="${escapeHtml(item.covType || '')}" data-category="${escapeHtml(item.category || '')}"
-            data-sum="${item.sumInsured}" data-premium="${item.premium}">
-            <input type="checkbox" ${isChecked ? 'checked' : ''} />
-            <div class="checkmark"><svg viewBox="0 0 256 256"><rect fill="none" height="256" width="256"></rect><path d="M224.6,51.9a59.5,59.5,0,0,0-43-19.9,60.5,60.5,0,0,0-44,17.6L128,59.1l-7.5-7.4C97.2,28.3,59.2,26.3,35.9,47.4a59.9,59.9,0,0,0-2.3,87l83.1,83.1a15.9,15.9,0,0,0,22.6,0l81-81C243.7,113.2,245.6,75.2,224.6,51.9Z" stroke-width="20px" stroke="#000" fill="none"></path></svg></div>
-          </label>
-          <div class="summary-header">
-            <div class="summary-logo" style="width:60px; height:60px;">${cLogo ? `<img src="${cLogo}" alt="${escapeHtml(item.company)}">` : `<span>${escapeHtml(item.company)}</span>`}</div>
-            <div class="summary-title">
-              ${item.business ? `<div class="cs-tag" style="margin-bottom:6px; background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:11px;">${escapeHtml(item.business)}</div>` : ''}
-              <div class="summary-company-name" style="font-size:14px;">${escapeHtml(item.company)}</div>
-              <div class="plan-name" style="font-size:12px; color: var(--text-2);">${escapeHtml(item.plan)}</div>
-              ${item.group ? `<div class="group-name">${escapeHtml(item.group)}</div>` : ''}
-              ${item.covType ? `<div class="cs-tag cs-tag-type" style="margin-top:6px; font-size:10px;">${escapeHtml(item.covType)}</div>` : ''}
+        <div class="fav-item-card" style="--brand-color: ${cColor};">
+          <div class="fav-item-logo">${cLogo ? `<img src="${cLogo}" alt="${escapeHtml(item.company)}">` : `<span>${escapeHtml(item.company)}</span>`}</div>
+          <div class="fav-item-info">
+            ${item.business ? `<div class="fav-item-biz-tag">${escapeHtml(item.business)}</div>` : ''}
+            <div class="fav-item-name">${escapeHtml(item.company)} - ${escapeHtml(item.plan)}</div>
+            <div class="fav-item-meta">
+              <span>ทุน: <strong>${fmt(item.sumInsured)}</strong></span>
+              <span>เบี้ย: <strong style="color:var(--brand-color);">${fmt(item.premium)}</strong></span>
+              ${item.group ? `<span>กลุ่ม: <strong>${escapeHtml(item.group)}</strong></span>` : ''}
             </div>
           </div>
-          <button type="button" class="btn-h" style="margin-top:12px; width:100%; height: 40px; font-size: 13px; border-radius: 10px;" onclick="goToUserForm('${escapeHtml(item.company)}', '${escapeHtml(item.plan)}', '${escapeHtml(item.group || '')}', '${escapeHtml(item.business || '')}', '${item.sumInsured || ''}')">
-            <i class="ti ti-phone-call"></i>
-            <span>สนใจแผนนี้</span>
-          </button>
+          <div class="fav-item-actions">
+            <button type="button" class="btn-h fav-item-btn" onclick="goToUserForm('${escapeHtml(item.company)}', '${escapeHtml(item.plan)}', '${escapeHtml(item.group || '')}', '${escapeHtml(item.business || '')}', '${item.sumInsured || ''}')">
+              <i class="ti ti-phone-call"></i>
+              <span>สนใจ</span>
+            </button>
+            <label class="fav-item-remove-btn" onclick="toggleFavorite(this); this.closest('.fav-item-card').remove(); event.stopPropagation()"
+              data-business="${escapeHtml(item.business || '')}"
+              data-company="${escapeHtml(item.company)}" data-plan="${escapeHtml(item.plan)}" data-group="${escapeHtml(item.group || '')}"
+              data-covtype="${escapeHtml(item.covType || '')}" data-category="${escapeHtml(item.category || '')}"
+              data-sum="${item.sumInsured}" data-premium="${item.premium}" title="ลบออกจากรายการโปรด">
+              <input type="checkbox" ${isChecked ? 'checked' : ''} />
+              <i class="ti ti-trash"></i>
+            </label>
+          </div>
         </div>`;
     }).join('');
     contentHtml += `<div class="m-body fav-list-container">${favListHtml}</div>`;

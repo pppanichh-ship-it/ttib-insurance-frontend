@@ -15,304 +15,6 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script defer src="user-script.js"></script>
 
-  <style>
-  /* ── Table Area Layout ── */
-  #table-area {
-    max-width: 1400px; /* ขยายความกว้างสูงสุดเพื่อให้รองรับการ์ดได้มากขึ้น */
-    margin: 40px auto; /* เพิ่มระยะห่างบน-ล่าง และจัดกึ่งกลาง */
-    padding: 0 20px;   /* เพิ่มระยะห่างด้านข้างเล็กน้อย */
-  }
-
-  /* ── New Plan Card Layout (Hover Effect) ── */
-  .plan-container {
-    position: relative;
-    width: 100%;
-    max-width: 400px; /* กำหนดความกว้างของการ์ดแต่ละใบ */
-  }
-
-  .plan-summary {
-    position: relative; /* สำหรับ ::before pseudo-element */
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 20px; /* เพิ่มความโค้งมน */
-    padding: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.03);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    border-top: 4px solid var(--brand-color); /* เปลี่ยนจาก border-left เป็น border-top */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 200px; /* เพิ่มความสูงเล็กน้อย */
-    overflow: hidden; /* ซ่อนส่วนที่เกินขอบเขต */
-  }
-
-  /* เอฟเฟกต์แสงเรืองรองเมื่อ hover */
-  .plan-summary::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 150px;
-    background: radial-gradient(circle at 50% 0%, var(--brand-color), transparent 70%);
-    opacity: 0;
-    transform: translateY(-50%) scale(1.2);
-    transition: all 0.4s ease-out;
-    pointer-events: none;
-  }
-
-  .plan-summary:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07), 0 5px 10px rgba(0, 0, 0, 0.04);
-  }
-
-  .plan-summary:hover::before {
-    opacity: 0.1;
-    transform: translateY(-60%) scale(1);
-  }
-
-  .summary-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 24px;
-    position: relative; /* ทำให้เนื้อหาอยู่เหนือ ::before */
-    z-index: 2;
-  }
-  .summary-logo {
-    width: 100px; height: 100px;
-    flex-shrink: 0;
-    border: 1px solid #f1f5f9;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    background: #fff;
-    padding: 5px;
-  }
-  .summary-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
-  .summary-logo span { font-weight: 800; font-size: 11px; color: var(--brand-color); }
-  .summary-title .plan-name { font-size: 16px; font-weight: 800; color: var(--text-1); line-height: 1.4; }
-  .summary-company-name {
-    font-size: 20px; font-weight: 800; color: var(--brand-color);
-    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
-  }
-  .summary-title .group-name { font-size: 12px; color: var(--text-2); font-weight: 600; }
-
-  .summary-footer {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    border-top: 1px solid var(--border);
-    padding-top: 20px;
-    position: relative; /* ทำให้เนื้อหาอยู่เหนือ ::before */
-    z-index: 2;
-  }
-  .summary-footer .premium-label { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; }
-  .summary-footer .premium-value { font-size: 22px; font-weight: 800; color: var(--brand-color); line-height: 1.2; }
-  .summary-footer .premium-value .unit { font-size: 12px; font-weight: 600; color: var(--text-2); }
-
-  .plan-detail-hover {
-    position: fixed; /* [1] เปลี่ยนเป็น fixed เพื่อยึดกับหน้าจอ */
-    top: 50%;
-    left: 50%;
-    width: 500px; /* ความกว้างของ card ที่ขยาย */
-    transform: translate(-80%, -80%) scale(0.9);
-    opacity: 0;
-    visibility: hidden;
-    z-index: 1001; /* [2] เพิ่ม z-index ให้สูงกว่า overlay */
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none;
-  }
-
-  /* [NEW] Overlay for click-to-view */
-  .plan-detail-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 1000;
-    animation: fadeIn 0.3s ease;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease;
-  }
-
-  .plan-container.is-active .plan-detail-overlay {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .plan-container.is-active .plan-detail-hover {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
-
-  /* ปรับแต่ง tinder-card ภายใน hover-view */
-  .plan-detail-hover .tinder-card {
-    box-shadow: var(--sh-lg);
-    border: 1.5px solid #e2e8f0;
-  }
-  .plan-detail-hover .tc-val-item {
-    display: flex; align-items: flex-start; gap: 6px; width: 100%;
-    font-size: 12px; color: #475569; line-height: 1.5; font-weight: 500;
-  }
-  .plan-detail-hover .tc-val-item span { text-align: right; word-break: break-word; }
-  .plan-detail-hover .no-cov-data { text-align: center; padding: 20px; color: var(--text-3); font-size: 13px; }
-  .plan-detail-hover .cov-section-title { text-align:center; margin:5px 0 10px; font-size:11px; font-weight:800; color:#047857; background:#f0fdf4; border:1px solid #10b981; padding:4px 12px; border-radius:20px; text-transform:uppercase; display:inline-block; }
-
-  /* [NEW] Close button for detail view */
-  .detail-close-btn {
-    position: absolute;
-    top: -15px;
-    right: -15px;
-    width: 36px;
-    height: 36px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    box-shadow: var(--sh-md);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-2);
-    font-size: 20px;
-    transition: all 0.2s;
-  }
-  .detail-close-btn:hover { transform: scale(1.1) rotate(90deg); color: var(--danger); }
-
-  /* ── [NEW] Coverage Detail Group (details/summary) ── */
-     .cov-group {
-      border-bottom: 1px solid #f1f5f9;
-    }
-    .cov-group:last-child { border-bottom: none; }
-    .cov-group summary {
-      padding: 12px 10px;
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--text-1);
-      cursor: pointer;
-      list-style: none; /* Hide default marker */
-      position: relative;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .cov-group summary:hover { background: #f8fafc; }
-    .cov-group summary::after {
-      content: '\\eab6'; /* ti-chevron-down */
-      font-family: 'tabler-icons';
-      font-size: 16px;
-      color: var(--text-3);
-      transition: transform 0.2s ease-in-out;
-    }
-    .cov-group[open] > summary::after {
-      transform: rotate(180deg);
-    }
-    .cov-items-list {
-      padding: 0px 10px 15px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .cov-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      font-size: 12.5px;
-      line-height: 1.6;
-    }
-    .cov-item.is-covered { color: var(--text-1); font-weight: 600; }
-    .cov-item.is-covered i { color: #10b981; }
-    .cov-item.is-not-covered { color: #94a3b8; text-decoration: line-through; }
-    .cov-item.is-not-covered i { color: #cbd5e1; }
-    .cov-item i { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
-
-  /* ── [NEW] Sum Insured Range Slider ── */
-  .sum-range-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    width: 100%;
-  }
-  .fctrl-range {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 6px;
-    background: #e2e8f0;
-    border-radius: 5px;
-    outline: none;
-    cursor: pointer;
-  }
-  .fctrl-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background: var(--accent);
-    border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-  .fctrl-range::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: var(--accent);
-    border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    cursor: pointer;
-  }
-  .fctrl-range:active::-webkit-slider-thumb { transform: scale(1.15); }
-  .sum-range-value {
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--accent);
-    background: #eff6ff;
-    padding: 6px 12px;
-    border-radius: 8px;
-    min-width: 130px;
-    text-align: center;
-    border: 1px solid #bfdbfe;
-  }
-      .chatbot header {
-        padding: 16px 0;
-        position: relative;
-        text-align: center;
-        color: #fff;
-        background: var(--accent);
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      }
-      .chatbot header h2 { margin: 0; font-size: 1.4rem; }
-      .chatbot .chatbox {
-        overflow-y: auto;
-        height: 450px;
-        padding: 30px 20px 100px;
-      }
-      .chatbox .chat { display: flex; list-style: none; }
-      .chatbox .incoming .chatbot-avatar { 
-        height: 60px; width: 60px; 
-        background: #fff;
-        border-radius: 50%;
-        margin: 0 10px 7px 0;
-        flex-shrink: 0;
-        overflow: hidden;
-      }
-      .chatbox .outgoing { margin: 20px 0; justify-content: flex-end; }
-      .chatbox .chat p { color: #fff; max-width: 75%; font-size: 0.95rem; padding: 12px 16px; border-radius: 10px 10px 0 10px; background: var(--accent); }
-      .chatbox .chat p.error { background: #f87171; }
-      .chatbox .incoming p { color: #000; background: #f2f2f2; border-radius: 10px 10px 10px 0; }
-      .chatbot .chat-input { display: flex; gap: 5px; position: absolute; bottom: 0; width: 100%; background: #fff; padding: 3px 20px; border-top: 1px solid #ddd; }
-      .chat-input textarea { height: 55px; width: 100%; border: none; outline: none; resize: none; max-height: 180px; padding: 15px; font-size: 0.95rem; font-family: 'Sarabun', sans-serif; }
-      .chat-input span { align-self: flex-end; color: var(--accent); cursor: pointer; height: 55px; display: flex; align-items: center; font-size: 1.35rem; }
-  </style>
-
   <!-- [NEW] Mobile Responsiveness -->
   <style>
     @media (max-width: 1200px) {
@@ -395,6 +97,46 @@
       .chatbot-toggler { right: 15px; bottom: 20px; width: 60px; height: 60px; }
       .chatbot-toggler img { width: 70px; height: 70px; }
     }
+
+    /* [NEW] Styles for Sum Input Group */
+    .sum-input-group {
+      display: flex;
+      align-items: center;
+      border: 1px solid #d1d5db; /* var(--border-color, #d1d5db) */
+      border-radius: 12px; /* var(--radius-lg, 12px) */
+      background-color: white;
+      overflow: hidden;
+      transition: box-shadow 0.2s ease;
+    }
+    .sum-input-group:focus-within {
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); /* var(--brand-light-focus, ...) */
+      border-color: #3b82f6; /* var(--brand, #3b82f6) */
+    }
+    .sum-input-group .sum-btn {
+      background-color: #f9fafb; /* var(--bg-subtle, #f9fafb) */
+      border: none;
+      padding: 0 16px;
+      cursor: pointer;
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      color: #4b5563; /* var(--text-muted, #4b5563) */
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .sum-input-group .sum-btn:hover {
+      background-color: #f3f4f6; /* var(--bg-subtle-hover, #f3f4f6) */
+      color: #111827; /* var(--text-1, #111827) */
+    }
+    .sum-input-group .sum-input-display {
+      border: none;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a8a; /* var(--brand-dark, #1e3a8a) */
+      box-shadow: none;
+      padding: 12px 8px;
+      min-width: 100px;
+    }
   </style>
 
 </head>
@@ -472,9 +214,9 @@
       <div class="fg" style="flex: 2; min-width: 280px;">
         <label class="flbl" for="inp-sum">ทุนประกันภัย</label>
         <div class="sum-input-group">
-          <button type="button" class="sum-btn sum-btn-minus" id="btn-sum-minus" title="ลดทุนประกัน">-</button>
+          <button type="button" class="sum-btn sum-btn-minus" id="btn-sum-minus" title="ลดทุนประกัน"><i class="ti ti-minus"></i></button>
           <input type="text" id="inp-sum" class="fctrl sum-input-display" value="500,000">
-          <button type="button" class="sum-btn sum-btn-plus" id="btn-sum-plus" title="เพิ่มทุนประกัน">+</button>
+          <button type="button" class="sum-btn sum-btn-plus" id="btn-sum-plus" title="เพิ่มทุนประกัน"><i class="ti ti-plus"></i></button>
         </div>
       </div>
 
