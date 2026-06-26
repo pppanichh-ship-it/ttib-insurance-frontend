@@ -1222,29 +1222,29 @@ function buildTinderCardHTML(cardId, plan, price, sumInsured, cColor, cLogo, com
             <span>สนใจทำประกันภัย</span>
           </button>
       </article>
-    <div class="plan-detail-hover">
-        <div class="tinder-card">
-          <div class="tc-grabber"><span></span></div>
-          <div class="tc-header">
-            <button class="detail-close-btn" onclick="togglePlanDetail(this, false)" title="ปิด"><i class="ti ti-x"></i></button>
-            <div class="tc-plan-name">${escapeHtml(plan.plan) || 'ชื่อแผนประกัน'}</div>
-            <div class="tc-company-name">${escapeHtml(plan.company)}${plan.group ? ` &middot; ${escapeHtml(plan.group)}` : ''}</div>
-            ${groupLength > 1 ? `<div class="tinder-counter">${curIdx + 1} / ${groupLength}</div>` : ''}
-          </div>
-          <div class="tc-section-title">รายการความคุ้มครอง</div>
-          <div class="tc-table-scroll">
-            ${detailHtml || '<div class="no-cov-data">ไม่มีข้อมูลความคุ้มครอง</div>'}
-          </div>
-          <div class="tc-footer">
-            <button class="tinder-nav-btn tinder-btn-prev" onclick="moveCompanyCard('${compEscaped}',-1, event)" ${curIdx === 0 ? 'disabled' : ''} title="แผนก่อนหน้า">&#8249;</button>
-            <button class="btn-h" onclick="openDetailModal()">
-              <i class="ti ti-clipboard-list"></i>
-              <span>ดูรายละเอียดเต็ม</span>
-            </button>
-            <button class="tinder-nav-btn tinder-btn-next" onclick="moveCompanyCard('${compEscaped}',1, event)" ${curIdx === groupLength - 1 ? 'disabled' : ''} title="แผนถัดไป">&#8250;</button>
+      <div class="plan-detail-hover">
+          <div class="tinder-card">
+            <div class="tc-grabber"><span></span></div>
+            <div class="tc-header">
+              <button class="detail-close-btn" onclick="togglePlanDetail(this, false)" title="ปิด"><i class="ti ti-x"></i></button>
+              <div class="tc-plan-name">${escapeHtml(plan.plan) || 'ชื่อแผนประกัน'}</div>
+              <div class="tc-company-name">${escapeHtml(plan.company)}${plan.group ? ` &middot; ${escapeHtml(plan.group)}` : ''}</div>
+              ${groupLength > 1 ? `<div class="tinder-counter">${curIdx + 1} / ${groupLength}</div>` : ''}
+            </div>
+            <div class="tc-section-title">รายการความคุ้มครอง</div>
+            <div class="tc-table-scroll">
+              ${detailHtml || '<div class="no-cov-data">ไม่มีข้อมูลความคุ้มครอง</div>'}
+            </div>
+            <div class="tc-footer">
+              <button class="tinder-nav-btn tinder-btn-prev" onclick="moveCompanyCard('${compEscaped}',-1, event)" ${curIdx === 0 ? 'disabled' : ''} title="แผนก่อนหน้า">&#8249;</button>
+              <button class="btn-h" onclick="openDetailModal()">
+                <i class="ti ti-clipboard-list"></i>
+                <span>ดูรายละเอียดเต็ม</span>
+              </button>
+              <button class="tinder-nav-btn tinder-btn-next" onclick="moveCompanyCard('${compEscaped}',1, event)" ${curIdx === groupLength - 1 ? 'disabled' : ''} title="แผนถัดไป">&#8250;</button>
+            </div>
           </div>
         </div>
-      </div>
       <div class="plan-detail-overlay" onclick="togglePlanDetail(this, false)"></div>
 
     </div>`;

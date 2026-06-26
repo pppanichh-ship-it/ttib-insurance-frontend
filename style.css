@@ -1591,6 +1591,7 @@ select.fctrl { cursor: pointer; }
     padding: 0;
     border-radius: 0;   /* [FIX] ตัดโค้งมุมออก */
     overflow-y: auto;
+    z-index: 10000px;
   }
 
   /* [FIX] การ์ดข้างในต้องเต็มความสูงด้วย */
