@@ -1565,19 +1565,19 @@ select.fctrl { cursor: pointer; }
 
   /* Adjust the card itself for full-screen view */
   body.plan-detail-is-active .plan-container.is-active .tinder-card {
-    border-radius: 0;
-    box-shadow: none;
-    border: none;
-    transform: none !important; /* Override hover transform */
+    border-radius: 0; /* ทำให้ขอบของการ์ดไม่โค้งมน (เป็นสี่เหลี่ยม) เพื่อให้เต็มจอพอดี */
+    box-shadow: none; /* เอากล่องเงาออก เพราะการ์ดจะเต็มจอแล้ว */
+    border: none; /* เอาเส้นขอบออก */
+    transform: none !important; /* ยกเลิกการ transform (เช่น การขยายเมื่อ hover) เพื่อให้การ์ดแสดงผลนิ่งๆ */
   }
 
   /* Reposition navigation buttons for mobile */
   body.plan-detail-is-active .plan-container.is-active .tinder-nav {
-    top: auto;
-    bottom: 20px; /* Place at the bottom */
-    left: 20px;
-    right: 20px;
-    transform: none;
+    top: auto; /* ยกเลิกการจัดตำแหน่งบน */
+    bottom: 20px; /* จัดตำแหน่งปุ่มไว้ด้านล่างของหน้าจอ */
+    left: 20px; /* เว้นระยะห่างจากขอบซ้าย */
+    right: 20px; /* เว้นระยะห่างจากขอบขวา */
+    transform: none; /* ยกเลิกการ transform เพื่อให้แสดงผลตามตำแหน่งที่กำหนด */
   }
 }
 /* ==========================================================================
@@ -2051,17 +2051,17 @@ select.fctrl { cursor: pointer; }
     }
 
     /* [NEW] Adjust tinder-card content for mobile */
-    .tinder-card {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
+    body.plan-detail-is-active .plan-container.is-active .tinder-card {
+        display: flex; /* กำหนดให้ใช้ Flexbox layout สำหรับจัดเรียงองค์ประกอบภายใน */
+        flex-direction: column; /* จัดเรียงองค์ประกอบภายใน (header, content, footer) เป็นแนวตั้ง */
+        height: 100%; /* ทำให้การ์ดมีความสูงเต็ม 100% ของพื้นที่ container */
     }
-    .tc-header { padding: 15px 20px; }
-    .tc-header .tc-plan-name { font-size: 14px; }
-    .tc-table-scroll { flex: 1; }
-    .tc-footer { padding: 10px 20px; font-size: 10px; }
-    .tinder-counter { top: 18px; left: 20px; }
-    .detail-close-btn { top: 15px; right: 15px; width: 32px; height: 32px; font-size: 18px; }
+    body.plan-detail-is-active .plan-container.is-active .tc-header { padding: 15px 20px; } /* ลดระยะห่างภายในของส่วนหัวการ์ด */
+    body.plan-detail-is-active .plan-container.is-active .tc-header .tc-plan-name { font-size: 14px; } /* ลดขนาดตัวอักษรของชื่อแผน */
+    body.plan-detail-is-active .plan-container.is-active .tc-table-scroll { flex: 1; } /* ทำให้ส่วนเนื้อหาที่เลื่อนได้ (ตาราง) ขยายเต็มพื้นที่ที่เหลือ */
+    .tc-footer { padding: 10px 20px; font-size: 10px; } /* ลดระยะห่างและขนาดตัวอักษรของส่วนท้าย */
+    .tinder-counter { top: 18px; left: 20px; } /* ปรับตำแหน่งตัวนับการ์ด */
+    .detail-close-btn { top: 15px; right: 15px; width: 32px; height: 32px; font-size: 18px; } /* ปรับขนาดและตำแหน่งปุ่มปิด */
 
     .chatbot { right: 15px; bottom: 85px; width: calc(100% - 30px); }
     .chatbot-toggler { right: 15px; bottom: 20px; width: 60px; height: 60px; }
