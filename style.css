@@ -1567,7 +1567,7 @@ select.fctrl { cursor: pointer; }
   }
 
   body.plan-detail-is-active .plan-container.is-active .tinder-nav {
-    position: fixed;    /* [FIX] เปลี่ยนเป็น fixed ให้ลอยอยู่เสมอ */
+    position: absolute;    /* [FIX] เปลี่ยนเป็น fixed ให้ลอยอยู่เสมอ */
     top: auto;
     bottom: 20px;
     left: 20px;
