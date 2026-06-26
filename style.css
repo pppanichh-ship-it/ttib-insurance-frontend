@@ -693,8 +693,8 @@ select.fctrl { cursor: pointer; }
 
 
 .fav-count {
-  position: sticky; /* เปลี่ยนเป็น absolute เพื่อให้ยึดติดกับปุ่ม */
-  top: 13px; /* ปรับตำแหน่งให้อยู่มุมบนขวาของปุ่ม */
+  position: sticky; /* [FIX] เปลี่ยนเป็น absolute เพื่อให้ยึดติดกับปุ่ม */
+  top:13px; /* ปรับตำแหน่งให้อยู่มุมบนขวาของปุ่ม */
   right: -5px;
   background: #F43F5E; /* Rose 500 */
   color: #fff;
@@ -1057,22 +1057,21 @@ select.fctrl { cursor: pointer; }
 
 .tinder-card {
   width: 100%;
+  height: 100%;
   background: rgb(255, 255, 255);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid rgba(226, 232, 240, 0.6);
   border-radius: 20px;
-  padding: 16px;
   color: #697e91;
   box-sizing: border-box;
   position: relative;
   will-change: transform, opacity;
   transform-style: preserve-3d;
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* Faster, smoother transition */
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 5);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  overflow: hidden; /* [NEW] Hide overflowing content like header background */
+  
 }
 
 /* [NEW] Enhanced scrollable area with fading effect */
@@ -1080,8 +1079,8 @@ select.fctrl { cursor: pointer; }
   max-height: 400px;
   flex-grow: 1; /* Allow this element to grow and fill available space */
   overflow-y: auto;
-  padding: 0 16px; /* Add padding to the content inside */
-  margin: 0 -16px; /* Negative margin to make scrollbar align with card edges */
+  padding: 0 24px; /* [MODIFIED] Adjust padding */
+  margin: 0; /* [MODIFIED] Remove negative margin */
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 20px, black 90%, transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, black 20px, black 90%, transparent 100%);
 }
@@ -1104,18 +1103,21 @@ select.fctrl { cursor: pointer; }
 
 /* ── Card Components ── */
 .tc-header {
+  padding: 24px 24px 20px; /* [MODIFIED] Adjusted padding */
+  position: relative;
+  flex-shrink: 0; /* Prevent header from shrinking */
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(145deg, var(--brand-color) 0%, color-mix(in srgb, var(--brand-color) 70%, black) 100%);
+}
+
+/* [REMOVED] Old tc-header styles are replaced by the new ones above */
+/*
   flex-direction: column;
   align-items: flex-start;
   text-align: center;
-  padding: 20px; /* Adjusted padding */
-  background: rgba(248, 250, 252, 0.8); /* Slightly transparent header */
-  border-radius: 14px; /* Adjusted to match inner elements */
-  position: relative;
   margin-bottom: 10px;
-  flex-shrink: 0; /* Prevent header from shrinking */
-  overflow: hidden;
-  border: 1px solid rgba(226, 232, 240, 0.7);
-}
+*/
 
 .tc-insurer-tag {
     display: inline-block;
@@ -1129,15 +1131,15 @@ select.fctrl { cursor: pointer; }
 
 .tc-company-name {
     font-size: 13px;
-    font-weight: 700;
-    color: var(--brand-color, var(--accent));
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.tc-plan-name  { font-size: 1.25rem; font-weight: 800; margin-bottom: 4px; color: #425675; line-height: 1.4; max-width: 100%; text-align: center; }
-.tc-group-name { font-weight: 700; margin-bottom: 16px; color: #64748b; max-width: 100%; text-align: center; font-size: 13px; }
+.tc-plan-name  { font-size: 1.25rem; font-weight: 800; margin-bottom: 4px; color: #fff; line-height: 1.4; max-width: 100%; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.tc-group-name { font-weight: 700; margin-bottom: 16px; color: rgba(255,255,255,0.8); max-width: 100%; font-size: 13px; }
 
 /* [REFACTOR] Unified Stat Block for summary-footer and tc-header-stats */
 .stat-block {
@@ -1146,8 +1148,8 @@ select.fctrl { cursor: pointer; }
     gap: 12px;
     width: 100%;
 }
-.stat-item { text-align: left; }
-.stat-label { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; margin-bottom: 2px; }
+.stat-item { text-align: center; }
+.stat-label { font-size: 11px; font-weight: 700; color: var(--text-2); text-transform: uppercase; margin-bottom: 2px; }
 .stat-value { font-size: 18px; font-weight: 800; color: var(--text-1); }
 .stat-value .unit { font-size: 12px; font-weight: 600; color: var(--text-2); margin-left: 2px; }
 
@@ -1156,13 +1158,14 @@ select.fctrl { cursor: pointer; }
     padding: 12px 16px;
     border-top: 1px solid var(--border);
 }
-.summary-footer .stat-item { text-align: center; }
-.summary-footer .stat-label { color: var(--text-2); }
 
 .tc-header-stats {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.1);
+    padding: 12px;
+    border-radius: 12px;
 }
 
 .tc-mark-count {
@@ -1182,7 +1185,7 @@ select.fctrl { cursor: pointer; }
 
 .tc-section-title {
     font-size: 11px; font-weight: 800; color: #94a3b8;
-    text-transform: uppercase; letter-spacing: 0.5px;
+    text-transform: uppercase; letter-spacing: 0.5px; padding: 0 24px;
     margin: 10px 0 10px; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;
     flex-shrink: 0; /* Prevent title from shrinking */
 }
@@ -1190,7 +1193,7 @@ select.fctrl { cursor: pointer; }
 .tc-cov-row {
     display: flex; 
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     padding: 12px 0; 
     border-bottom: 1px solid var(--border);
     gap: 20px; 
@@ -1252,7 +1255,7 @@ select.fctrl { cursor: pointer; }
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid #f1f5f9;
-  flex-shrink: 0;
+  flex-shrink: 0; padding: 15px 24px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1476,37 +1479,75 @@ select.fctrl { cursor: pointer; }
   100% { transform: scale(1); }
 }
 
-/* ── [NEW] Favorites Modal Styles ── */
+/* ==========================================================================
+   ── [REFACTORED] Favorites Modal Styles
+   ========================================================================== */
 .fav-list-container {
   background: #f1f5f9;
   padding: 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 16px;
   overflow-y: auto;
   flex: 1; /* Ensure it fills space in flex container on mobile */
 }
 
-.fav-card {
-  position: relative;
-  cursor: default;
+.fav-item-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 20px;
-  background: var(--surface);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-  transition: all 0.2s ease-in-out;
+  padding: 16px;
+  box-shadow: var(--sh-sm);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.fav-card:hover {
+.fav-item-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+  box-shadow: var(--sh-lg);
   border-color: var(--accent);
 }
+.fav-item-logo {
+  width: 52px; height: 52px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #f8fafc; border-radius: 12px; border: 1px solid #f1f5f9; padding: 6px;
+}
+.fav-item-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.fav-item-info { flex: 1; min-width: 0; }
+.fav-item-biz-tag {
+  display: inline-block; background: #f1f5f9; color: #475569;
+  border: 1px solid #e2e8f0; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 6px; margin-bottom: 6px;
+}
+.fav-item-name { font-size: 14px; font-weight: 800; color: var(--text-1); margin-bottom: 4px; }
+.fav-item-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11px; color: var(--text-2); }
+.fav-item-meta strong { color: var(--text-1); font-weight: 700; }
+
+.fav-item-actions { display: flex; align-items: center; gap: 8px; }
+.fav-item-btn { height: 38px; padding: 0 16px; font-size: 12px; border-radius: 10px; }
+.fav-item-remove-btn {
+  width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+  background: #f8fafc; border: 1px solid var(--border); color: var(--text-3);
+  border-radius: 10px; cursor: pointer; transition: all 0.2s;
+}
+.fav-item-remove-btn:hover { background: #fef2f2; border-color: #fecaca; color: var(--danger); }
+.fav-item-remove-btn input { display: none; }
+
+.fav-empty-state { text-align: center; padding: 80px 20px; background: #fff; flex: 1; }
+.fav-empty-icon {
+  width: 100px; height: 100px; background: #f1f5f9; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 25px;
+}
+.fav-empty-icon i { font-size: 48px; color: #cbd5e1; }
+.fav-empty-title { font-size: 16px; color: #475569; font-weight: 700; }
+.fav-empty-desc { font-size: 13px; color: #94a3b8; max-width: 320px; margin: 8px auto 0; line-height: 1.6; }
+
 .btn-clear-favs {
   background: #fef2f2;
   color: #dc2626;
   border: 1px solid #fecaca;
-  padding: 6px 14px;
+  padding: 7px 14px;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
@@ -1520,10 +1561,6 @@ select.fctrl { cursor: pointer; }
 .btn-clear-favs:hover { background: #fee2e2; border-color: #fca5a5; }
 
 @media (max-width: 768px) {
-  #favoritesModal .m-body {
-    grid-template-columns: 1fr !important; /* 1 column on mobile */
-    padding: 16px !important;
-  }
   #favoritesModal.modal-overlay {
     padding: 0; /* Remove padding for full-screen modal */
   }
@@ -1548,7 +1585,7 @@ select.fctrl { cursor: pointer; }
   /* [FIX] plan-detail-hover ต้องเป็น fixed ด้วย ไม่ใช่ absolute */
   body.plan-detail-is-active .plan-container.is-active .plan-detail-hover {
     position: fixed;    /* [FIX] เปลี่ยนจาก absolute → fixed */
-    inset: 0;
+    inset: 0; /* [MODIFIED] Use inset */
     width: 100%;
     height: 100%;
     padding: 0;
@@ -1567,26 +1604,14 @@ select.fctrl { cursor: pointer; }
   }
 
   body.plan-detail-is-active .plan-container.is-active .tinder-nav {
-    position: absolute;    /* [FIX] เปลี่ยนเป็น fixed ให้ลอยอยู่เสมอ */
+    position: fixed;    /* [MODIFIED] Ensure it's fixed */
     top: auto;
     bottom: 20px;
     left: 20px;
     right: 20px;
     transform: none;
-    z-index: 1010;      /* [FIX] ให้อยู่เหนือการ์ด */
+    z-index: 1012;      /* [MODIFIED] Above the card content */
   }
-}
-/* ==========================================================================
-   ── [MOVED & REFACTORED] User Page Specific Styles
-   ========================================================================== */
-
-  /* ── User-only overrides ── */
-  .user-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: linear-gradient(135deg,#e1f5ee,#d1f5e8);
-    color: #0f6e56; font-size: 11px; font-weight: 700;
-    padding: 4px 12px; border-radius: 30px;
-    border: 1px solid #9fe1cb; letter-spacing: 0.3px;
   }
 
   /* Welcome hero banner */
@@ -1915,6 +1940,298 @@ select.fctrl { cursor: pointer; }
   }
 
 /* ==========================================================================
+   ── [MOVED] Index Page Specific Styles
+   ========================================================================== */
+
+  /* ── Table Area Layout ── */
+  #table-area {
+    max-width: 1400px; /* ขยายความกว้างสูงสุดเพื่อให้รองรับการ์ดได้มากขึ้น */
+    margin: 40px auto; /* เพิ่มระยะห่างบน-ล่าง และจัดกึ่งกลาง */
+    padding: 0 20px;   /* เพิ่มระยะห่างด้านข้างเล็กน้อย */
+  }
+
+  /* ── New Plan Card Layout (Hover Effect) ── */
+  .plan-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px; /* กำหนดความกว้างของการ์ดแต่ละใบ */
+  }
+
+  .plan-summary {
+    position: relative; /* สำหรับ ::before pseudo-element */
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 20px; /* เพิ่มความโค้งมน */
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border-top: 4px solid var(--brand-color); /* เปลี่ยนจาก border-left เป็น border-top */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 200px; /* เพิ่มความสูงเล็กน้อย */
+    overflow: hidden; /* ซ่อนส่วนที่เกินขอบเขต */
+  }
+
+  /* เอฟเฟกต์แสงเรืองรองเมื่อ hover */
+  .plan-summary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 150px;
+    background: radial-gradient(circle at 50% 0%, var(--brand-color), transparent 70%);
+    opacity: 0;
+    transform: translateY(-50%) scale(1.2);
+    transition: all 0.4s ease-out;
+    pointer-events: none;
+  }
+
+  .plan-summary:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07), 0 5px 10px rgba(0, 0, 0, 0.04);
+  }
+
+  .plan-summary:hover::before {
+    opacity: 0.1;
+    transform: translateY(-60%) scale(1);
+  }
+
+  .summary-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 24px;
+    position: relative; /* ทำให้เนื้อหาอยู่เหนือ ::before */
+    z-index: 2;
+  }
+  .summary-logo {
+    width: 100px; height: 100px;
+    flex-shrink: 0;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff;
+    padding: 5px;
+  }
+  .summary-logo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .summary-logo span { font-weight: 800; font-size: 11px; color: var(--brand-color); }
+  .summary-title .plan-name { font-size: 16px; font-weight: 800; color: var(--text-1); line-height: 1.4; }
+  .summary-company-name {
+    font-size: 20px; font-weight: 800; color: var(--brand-color);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+  }
+  .summary-title .group-name { font-size: 12px; color: var(--text-2); font-weight: 600; }
+
+  .summary-footer .premium-label { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; }
+  .summary-footer .premium-value { font-size: 22px; font-weight: 800; color: var(--brand-color); line-height: 1.2; }
+  .summary-footer .premium-value .unit { font-size: 12px; font-weight: 600; color: var(--text-2); }
+
+  .plan-detail-hover {
+    position: fixed; /* [1] เปลี่ยนเป็น fixed เพื่อยึดกับหน้าจอ */
+    top: 50%;
+    left: 50%;
+    width: 500px; /* ความกว้างของ card ที่ขยาย */
+    transform: translate(-80%, -80%) scale(0.9);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1001; /* [2] เพิ่ม z-index ให้สูงกว่า overlay */
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  /* [NEW] Overlay for click-to-view */
+  .plan-detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+  }
+
+  .plan-container.is-active .plan-detail-overlay {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .plan-container.is-active .plan-detail-hover {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* ปรับแต่ง tinder-card ภายใน hover-view */
+  .plan-detail-hover .tinder-card {
+    box-shadow: var(--sh-lg);
+    border: 1.5px solid #e2e8f0;
+  }
+  .plan-detail-hover .tc-val-item {
+    display: flex; align-items: flex-start; gap: 6px; width: 100%;
+    font-size: 12px; color: #475569; line-height: 1.5; font-weight: 500;
+  }
+  .plan-detail-hover .tc-val-item span { text-align: right; word-break: break-word; }
+  .plan-detail-hover .no-cov-data { text-align: center; padding: 20px; color: var(--text-3); font-size: 13px; }
+  .plan-detail-hover .cov-section-title { text-align:center; margin:5px 0 10px; font-size:11px; font-weight:800; color:#047857; background:#f0fdf4; border:1px solid #10b981; padding:4px 12px; border-radius:20px; text-transform:uppercase; display:inline-block; }
+
+  /* [NEW] Close button for detail view */
+  .detail-close-btn {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 36px;
+    height: 36px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    box-shadow: var(--sh-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-2);
+    font-size: 20px;
+    transition: all 0.2s;
+  }
+  .detail-close-btn:hover { transform: scale(1.1) rotate(90deg); color: var(--danger); }
+
+  /* ── [NEW] Coverage Detail Group (details/summary) ── */
+     .cov-group {
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .cov-group:last-child { border-bottom: none; }
+    .cov-group summary {
+      padding: 12px 10px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-1);
+      cursor: pointer;
+      list-style: none; /* Hide default marker */
+      position: relative;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cov-group summary:hover { background: #f8fafc; }
+    .cov-group summary::after {
+      content: '\\eab6'; /* ti-chevron-down */
+      font-family: 'tabler-icons';
+      font-size: 16px;
+      color: var(--text-3);
+      transition: transform 0.2s ease-in-out;
+    }
+    .cov-group[open] > summary::after {
+      transform: rotate(180deg);
+    }
+    .cov-items-list {
+      padding: 0px 10px 15px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cov-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+    .cov-item.is-covered { color: var(--text-1); font-weight: 600; }
+    .cov-item.is-covered i { color: #10b981; }
+    .cov-item.is-not-covered { color: #94a3b8; text-decoration: line-through; }
+    .cov-item.is-not-covered i { color: #cbd5e1; }
+    .cov-item i { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+
+  /* ── [NEW] Sum Insured Range Slider ── */
+  .sum-range-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+  }
+  .fctrl-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+  }
+  .fctrl-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .fctrl-range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    cursor: pointer;
+  }
+  .fctrl-range:active::-webkit-slider-thumb { transform: scale(1.15); }
+  .sum-range-value {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--accent);
+    background: #eff6ff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    min-width: 130px;
+    text-align: center;
+    border: 1px solid #bfdbfe;
+  }
+
+  .chatbot header {
+    padding: 16px 0;
+    position: relative;
+    text-align: center;
+    color: #fff;
+    background: var(--accent);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .chatbot header h2 { margin: 0; font-size: 1.4rem; }
+  .chatbot .chatbox {
+    overflow-y: auto;
+    height: 450px;
+    padding: 30px 20px 100px;
+  }
+  .chatbox .chat { display: flex; list-style: none; }
+  .chatbox .incoming .chatbot-avatar {
+    height: 60px; width: 60px;
+    background: #fff;
+    border-radius: 50%;
+    margin: 0 10px 7px 0;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .chatbox .outgoing { margin: 20px 0; justify-content: flex-end; }
+  .chatbox .chat p { color: #fff; max-width: 75%; font-size: 0.95rem; padding: 12px 16px; border-radius: 10px 10px 0 10px; background: var(--accent); }
+  .chatbox .chat p.error { background: #f87171; }
+  .chatbox .incoming p { color: #000; background: #f2f2f2; border-radius: 10px 10px 10px 0; }
+  .chatbot .chat-input { display: flex; gap: 5px; position: absolute; bottom: 0; width: 100%; background: #fff; padding: 3px 20px; border-top: 1px solid #ddd; }
+  .chat-input textarea { height: 55px; width: 100%; border: none; outline: none; resize: none; max-height: 180px; padding: 15px; font-size: 0.95rem; font-family: 'Sarabun', sans-serif; }
+  .chat-input span { align-self: flex-end; color: var(--accent); cursor: pointer; height: 55px; display: flex; align-items: center; font-size: 1.35rem; }
+
+/* ==========================================================================
    ── [MOVED & REFACTORED] Mobile Responsiveness
    ========================================================================== */
 
@@ -1970,23 +2287,7 @@ select.fctrl { cursor: pointer; }
     .filter-row > .fg {
       min-width: 100%; /* 1 column on small screens */
     }
-    .sum-range-container {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-    }
-    .sum-range-value {
-      min-width: 100%;
-    }
-
-    .fixed-actions-bar .hdr-actions .btn-h span {
-      display: none; /* Hide text on buttons */
-    }
-    .fixed-actions-bar .hdr-actions .btn-h {
-      padding: 0 12px;
-      width: 44px;
-      height: 44px;
-    }
+ 
     .fixed-actions-bar .hdr-actions .btn-h i {
       margin-right: 0;
       font-size: 20px;
@@ -2000,22 +2301,6 @@ select.fctrl { cursor: pointer; }
       grid-template-columns: 1fr !important;
     }
     .plan-container {
-      max-width: 100%;
-    }
-
-    /* Make modals full-screen on mobile */
-    .modal-overlay .modal-win {
-      width: 100%;
-      max-width: 100%;
-      height: 100%;
-      max-height: 100%;
-      border-radius: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-overlay .modal-win .m-body,
-    .modal-overlay .modal-win #modal-table-area {
       flex: 1;
       overflow-y: auto;
     }
@@ -2108,3 +2393,58 @@ select.fctrl { cursor: pointer; }
     .footer-banner-grid { grid-template-columns: 1fr; gap: 20px; }
     .footer-main-content { grid-template-columns: 1fr; gap: 40px; }
   }
+
+/* ── Card Transition Animations ─────────────────────────────────── */
+@keyframes cardFadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cardFadeSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.96);
+  }
+}
+
+.plan-container {
+  animation: cardFadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.plan-container.is-leaving {
+  animation: cardFadeSlideOut 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+
+/* stagger delay ตาม index การ์ด */
+.plan-container:nth-child(1) { animation-delay: 0.00s; }
+.plan-container:nth-child(2) { animation-delay: 0.06s; }
+.plan-container:nth-child(3) { animation-delay: 0.12s; }
+.plan-container:nth-child(4) { animation-delay: 0.18s; }
+.plan-container:nth-child(5) { animation-delay: 0.24s; }
+.plan-container:nth-child(6) { animation-delay: 0.30s; }
+
+/* ── Grid container transition ───────────────────────────────────── */
+.multi-tinder-grid {
+  transition: opacity 0.15s ease;
+}
+.multi-tinder-grid.is-transitioning {
+  opacity: 0.4;
+  pointer-events: none;
+}
+/* ── Value Update Pulse (PATH B) ────────────────────────────────── */
+@keyframes cardValuePulse {
+  0%   { box-shadow: 0 0 0 0px rgba(66, 88, 211, 0.25); }
+  40%  { box-shadow: 0 0 0 8px rgba(66, 88, 211, 0.12); }
+  100% { box-shadow: 0 0 0 0px rgba(66, 88, 211, 0.00); }
+}
