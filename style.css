@@ -1547,7 +1547,7 @@ select.fctrl { cursor: pointer; }
 
   /* [FIX] plan-detail-hover ต้องเป็น fixed ด้วย ไม่ใช่ absolute */
   body.plan-detail-is-active .plan-container.is-active .plan-detail-hover {
-    position: fixed;    /* [FIX] เปลี่ยนจาก absolute → fixed */
+      /* [FIX] เปลี่ยนจาก absolute → fixed */
     inset: 0;
     width: 100%;
     height: 100%;
