@@ -1533,6 +1533,7 @@ select.fctrl { cursor: pointer; }
    ── [NEW] Mobile Responsiveness for Tinder Card Detail
    ========================================================================== */
 /* [FIX] ให้ plan-container ที่ active กลายเป็น fixed overlay เต็มจอ */
+/* [FIX] ให้ plan-container ที่ active กลายเป็น fixed overlay เต็มจอ */
 @media (max-width: 768px) {
   body.plan-detail-is-active .plan-container.is-active {
     position: fixed;
