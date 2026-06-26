@@ -342,22 +342,23 @@ body {
 .qb-btn:hover { transform: translateX(-4px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); background: #334155; }
 .qb-btn i { font-size: 16px; }
 
+/* ✅ แก้ไข */
 @media (max-width: 480px) {
-    .qb-btn span { display: none; }
-    .qb-btn { padding: 12px; border-radius: 50%; width: 44px; height: 44px; justify-content: center; }
-    .fixed-actions-bar .btn-h span { display: none; } /* ซ่อนข้อความในปุ่มบนมือถือ */
+  .qb-btn span { display: none; }
+  .qb-btn { padding: 12px; border-radius: 50%; width: 44px; height: 44px; justify-content: center; }
 
-    /* ปรับแต่งปุ่ม Floating ใน hdr-actions ให้เป็นวงกลม */
-    .fixed-actions-bar .hdr-actions { gap: 10px; } /* ปรับ gap บนมือถือ */
-    .fixed-actions-bar .hdr-actions .btn-h {
-        width: 54px; /* เพิ่มขนาดปุ่มบนมือถือ */
-        height: 54px; /* เพิ่มขนาดปุ่มบนมือถือ */
-        border-radius: 50%;
-        padding: 0;
-        justify-content: center;
-    }
-    .fixed-actions-bar .hdr-actions .btn-h i { font-size: 24px; } /* เพิ่มขนาดไอคอนบนมือถือ */
-    .hdr-group { gap: 8px; }
+  .fixed-actions-bar { overflow: visible; } /* [FIX] ให้ scale ไม่ถูก clip */
+  .fixed-actions-bar .btn-h span { display: none; }
+  .fixed-actions-bar .hdr-actions { gap: 10px; }
+  .fixed-actions-bar .hdr-actions .btn-h {
+    width: 50px; /* [FIX] ลดจาก 54px ป้องกัน scale overflow */
+    height: 50px;
+    border-radius: 50%;
+    padding: 0;
+    justify-content: center;
+  }
+  .fixed-actions-bar .hdr-actions .btn-h i { font-size: 22px; } /* [FIX] ลดจาก 24px ให้สัมพันธ์กับขนาดปุ่ม */
+  .hdr-group { gap: 8px; }
 }
 
 /* ==========================================================================
@@ -467,8 +468,22 @@ select.fctrl { cursor: pointer; }
 .stat:hover::after  { filter: blur(25px); }
 .stat:hover::before { transform: rotate(-10deg) scaleX(1.08) scaleY(1.15); }
 
-@media (max-width: 1100px) { #stats { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 700px)  { #stats { grid-template-columns: 1fr; gap: 20px; } }
+@media (max-width: 1100px) {
+  #stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px; /* [FIX] ลดจาก 30px */
+    padding: 20px 16px; /* [FIX] ลด padding */
+  }
+}
+  /* ✅ แก้ไข */
+  @media (max-width: 700px) {
+    #stats {
+      grid-template-columns: 1fr;
+      gap: 16px; /* [FIX] ลดจาก 20px */
+      padding: 16px 12px; /* [FIX] ลด padding */
+      margin-bottom: 16px; /* [FIX] ลด margin */
+    }
+  }
 
 
 #table-area {
@@ -1458,12 +1473,34 @@ select.fctrl { cursor: pointer; }
 .btn-clear-favs:hover { background: #fee2e2; border-color: #fca5a5; }
 
 @media (max-width: 768px) {
-  #favoritesModal .m-body {
-    grid-template-columns: 1fr !important; /* 1 column on mobile */
-    padding: 16px !important;
-  }
+
   #favoritesModal.modal-overlay {
-    padding: 0; /* Remove padding for full-screen modal */
+    padding: 0;
+  }
+
+  /* [FIX] override modal-win ให้ full-screen */
+  #favoritesModal .modal-win {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  /* [FIX] m-body ต้องเป็น flex ไม่ใช่ grid — ลบ grid-template-columns ทิ้ง */
+  #favoritesModal .m-body {
+    padding: 0 !important;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  /* [FIX] override .fav-list-container ที่ใช้ grid จริง */
+  #favoritesModal .fav-list-container {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    gap: 12px;
   }
 }
 
@@ -1472,7 +1509,7 @@ select.fctrl { cursor: pointer; }
    ========================================================================== */
 @media (max-width: 768px) {
 
-  /* Full-screen overlay for active plan container */
+  /* ── Plan Detail — Full Screen Overlay (active state) ── */
   body.plan-detail-is-active .plan-container.is-active {
     position: fixed;
     inset: 0;
@@ -1480,17 +1517,18 @@ select.fctrl { cursor: pointer; }
     height: 100%;
     z-index: 1000;
     margin: 0;
-    overflow: hidden; /* [FIX] ป้องกัน content ล้น */
+    overflow: hidden;
   }
 
-  /* Fill the fixed container */
   body.plan-detail-is-active .plan-container.is-active .plan-detail-hover {
-    position: absolute; /* [FIX] ต้องมี position ถึงจะใช้ inset ได้ */
+    position: absolute;
     inset: 0;
     padding: 0;
+    border-radius: 0;
+    z-index: 10;
   }
 
-  /* [FIX] Merged .tinder-card rules เป็น block เดียว */
+  /* [MERGED] รวม 2 duplicate .tinder-card blocks เป็น block เดียว */
   body.plan-detail-is-active .plan-container.is-active .tinder-card {
     border-radius: 0;
     box-shadow: none;
@@ -1501,7 +1539,6 @@ select.fctrl { cursor: pointer; }
     height: 100%;
   }
 
-  /* Navigation buttons at bottom */
   body.plan-detail-is-active .plan-container.is-active .tinder-nav {
     top: auto;
     bottom: 20px;
@@ -1520,10 +1557,9 @@ select.fctrl { cursor: pointer; }
 
   body.plan-detail-is-active .plan-container.is-active .tc-table-scroll {
     flex: 1;
-    overflow-y: auto; /* [FIX] ให้ scroll ได้จริง */
+    overflow-y: auto;
   }
 
-  /* [FIX] เพิ่ม scope selector ให้ครบ ป้องกัน override นอก context */
   body.plan-detail-is-active .plan-container.is-active .tc-footer {
     padding: 10px 20px;
     font-size: 10px;
@@ -1884,134 +1920,195 @@ select.fctrl { cursor: pointer; }
    ── [MOVED & REFACTORED] Mobile Responsiveness
    ========================================================================== */
 
-  @media (max-width: 1200px) {
-    .filter-row {
-      flex-wrap: wrap;
-    }
-    .filter-row > .fg {
-      min-width: calc(50% - 10px); /* 2 columns on medium screens */
-    }
-    .filter-row > .fg:first-child {
-      min-width: 100%; /* Search bar full width */
-    }
+@media (max-width: 1200px) {
+
+  /* [FIX] ลบ flex-wrap: wrap ออก — desktop มีอยู่แล้ว */
+
+  .filter-row > .fg {
+    flex: 1 1 calc(50% - 6px); /* [FIX] แก้จาก calc(50% - 10px) ให้ตรงกับ gap: 12px */
+    min-width: calc(50% - 6px);
   }
+
+  .filter-row > .fg:first-child {
+    flex: 1 1 100%; /* [FIX] reset flex ratio ก่อน ค่อย set min-width */
+    min-width: 100%;
+  }
+
+  /* [FIX] ลด min-width ให้พอดีกับ viewport 900–1200px */
+  .filter-actions-container {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
+}
 
   @media (max-width: 1024px) {
     .promo-grid { grid-template-columns: repeat(2, 1fr); }
+    .promo-card { padding: 18px; } /* [FIX] ลด padding เล็กน้อย */
+    .promo-img-box { height: 120px; } /* [FIX] ลดความสูงรูปให้พอดี */
   }
-
-  @media (max-width: 850px) { 
-    .info-grid { grid-template-columns: 1fr; } 
+  /* ✅ แก้ไข — ระบุ selector ให้ชัดเจน */
+  @media (max-width: 850px) {
+    /* [FIX] scope เฉพาะ insurance section ไม่ให้กระทบ modal */
+    .insurance-info-section .info-grid { 
+      grid-template-columns: 1fr; 
+    }
   }
 
   @media (max-width: 768px) {
-    #app-header {
-      padding: 0 12px;
-      height: 56px;
-    }
-    .hdr-logo { width: 110px; }
-    .hdr-title { font-size: 13px; }
-    .hdr-sub { display: none; }
-    .hdr-actions { gap: 6px; }
-    .btn-h { padding: 0 12px; height: 36px; font-size: 12px; }
-    .btn-h i { font-size: 16px; }
 
-    #app-main {
-      padding: 12px;
-    }
-
-    #user-hero {
-      padding: 200px 20px 40px;
-    }
-    #user-hero h1 {
-      font-size: 26px;
-    }
-    #user-hero p {
-      font-size: 14px;
-    }
-    .hero-steps {
-      gap: 10px;
-    }
-
-    .filter-row > .fg {
-      min-width: 100%; /* 1 column on small screens */
-    }
-    .sum-range-container {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-    }
-    .sum-range-value {
-      min-width: 100%;
-    }
-
-    .fixed-actions-bar .hdr-actions .btn-h span {
-      display: none; /* Hide text on buttons */
-    }
-    .fixed-actions-bar .hdr-actions .btn-h {
-      padding: 0 12px;
-      width: 44px;
-      height: 44px;
-    }
-    .fixed-actions-bar .hdr-actions .btn-h i {
-      margin-right: 0;
-      font-size: 20px;
-    }
-
-    .large-banner-item {
-      width: 95%;
-    }
-
-    .multi-tinder-grid {
-      grid-template-columns: 1fr !important;
-    }
-    .plan-container {
-      max-width: 100%;
-    }
-
-    /* Make modals full-screen on mobile */
-    .modal-overlay .modal-win {
-      width: 100%;
-      max-width: 100%;
-      height: 100%;
-      max-height: 100%;
-      border-radius: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-    }
-    .modal-overlay .modal-win .m-body,
-    .modal-overlay .modal-win #modal-table-area {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    /* Tinder card detail view on mobile */
-    .plan-detail-hover {
-      position: absolute; /* Change from fixed to absolute */
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      transform: scale(1); /* No more scaling */
-      border-radius: 20px;
-      overflow: hidden;
-    }
-    .plan-container.is-active .plan-detail-hover {
-      transform: scale(1);
-    }
-    .plan-container.is-active .plan-summary {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .detail-close-btn {
-      top: 10px; right: 10px;
-    }
-
-    .chatbot { right: 15px; bottom: 85px; width: calc(100% - 30px); }
-    .chatbot-toggler { right: 15px; bottom: 20px; width: 60px; height: 60px; }
-    .chatbot-toggler img { width: 70px; height: 70px; }
+  /* ── Header ── */
+  #app-header {
+    padding: 0 12px;
+    height: 56px;
   }
+  .hdr-logo  { width: 110px; }
+  .hdr-title { font-size: 13px; }
+  .hdr-sub   { display: none; }
+  .hdr-actions { gap: 6px; }
+  .btn-h { padding: 0 12px; height: 36px; font-size: 12px; }
+  .btn-h i { font-size: 16px; }
+
+  /* ── Main Layout ── */
+  #app-main { padding: 12px; }
+
+  /* ── Hero ── */
+  #user-hero {
+    padding: 120px 20px 40px; /* [FIX] ลดจาก 200px — ยังสูงเกินไปสำหรับ viewport 375px */
+  }
+  #user-hero h1 { font-size: 26px; }
+  #user-hero p  { font-size: 14px; }
+  .hero-steps   { gap: 10px; }
+
+  /* ── Filter Section ── */
+  .filter-row > .fg { min-width: 100%; }
+
+  /* [FIX] ป้องกัน min-width: 500px ล้นหน้าจอมือถือ */
+  .filter-actions-container {
+    flex: 1 !important;
+    min-width: 100% !important;
+  }
+
+  .sum-range-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .sum-range-value { min-width: 100%; }
+
+  /* ── Floating Actions Bar ── */
+  .fixed-actions-bar .hdr-actions .btn-h span { display: none; }
+  .fixed-actions-bar .hdr-actions .btn-h {
+    padding: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%; /* [FIX] เพิ่ม — ขาดไปทำให้ปุ่มเป็นสี่เหลี่ยมบน 481–768px */
+    justify-content: center;
+  }
+  .fixed-actions-bar .hdr-actions .btn-h i { margin-right: 0; font-size: 20px; }
+
+  /* ── Large Banner ── */
+  .large-banner-item { width: 95%; }
+
+  /* ── Tinder Grid ── */
+  .multi-tinder-grid  { grid-template-columns: 1fr !important; }
+  .plan-container     { max-width: 100%; }
+
+  /* ── Modal — Full Screen ── */
+  .modal-overlay .modal-win {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    margin: 0;
+    overflow: hidden; /* [FIX] เพิ่ม — ป้องกัน content ล้นออกนอก modal */
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-overlay .modal-win .m-body,
+  .modal-overlay .modal-win #modal-table-area {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  /* ── Favorites Modal ── */
+  #favoritesModal .m-body {
+    grid-template-columns: 1fr !important;
+    padding: 16px !important;
+  }
+  #favoritesModal.modal-overlay { padding: 0; }
+
+  /* ── Plan Detail Hover (general — non-active state) ── */
+  .plan-detail-hover {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 10; /* [FIX] เพิ่ม — ป้องกันถูก sibling element ทับ */
+    transform: scale(1);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .plan-container.is-active .plan-detail-hover { transform: scale(1); }
+  .plan-container.is-active .plan-summary {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .detail-close-btn { top: 10px; right: 10px; }
+
+  /* ── Plan Detail — Full Screen Overlay (active state) ── */
+  /* [MERGED] รวม 2 blocks เป็น block เดียว ป้องกัน conflict */
+  body.plan-detail-is-active .plan-container.is-active {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    margin: 0;
+    overflow: hidden;
+  }
+  body.plan-detail-is-active .plan-container.is-active .plan-detail-hover {
+    position: absolute; /* [FIX] ต้องมี position ถึงจะใช้ inset ได้ */
+    inset: 0;
+    padding: 0;
+    border-radius: 0;
+    z-index: 10;
+  }
+  body.plan-detail-is-active .plan-container.is-active .tinder-card {
+    /* [MERGED] รวม 2 duplicate blocks เป็น block เดียว */
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    transform: none !important;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  body.plan-detail-is-active .plan-container.is-active .tinder-nav {
+    top: auto;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    transform: none;
+  }
+  body.plan-detail-is-active .plan-container.is-active .tc-header        { padding: 15px 20px; }
+  body.plan-detail-is-active .plan-container.is-active .tc-header .tc-plan-name { font-size: 14px; }
+  body.plan-detail-is-active .plan-container.is-active .tc-table-scroll  {
+    flex: 1;
+    overflow-y: auto; /* [FIX] ให้ scroll ได้จริง */
+  }
+  body.plan-detail-is-active .plan-container.is-active .tc-footer        { padding: 10px 20px; font-size: 10px; }
+  body.plan-detail-is-active .plan-container.is-active .tinder-counter   { top: 18px; left: 20px; }
+  body.plan-detail-is-active .plan-container.is-active .detail-close-btn {
+    top: 15px; right: 15px;
+    width: 32px; height: 32px;
+    font-size: 18px;
+  }
+
+  /* ── Chatbot ── */
+  .chatbot         { right: 15px; bottom: 85px; width: calc(100% - 30px); }
+  .chatbot-toggler { right: 15px; bottom: 20px; width: 60px; height: 60px; }
+  .chatbot-toggler img { width: 70px; height: 70px; }
+}
 
   /* ==========================================================================
      ── [MOVED] Chatbot Styles
@@ -2069,8 +2166,17 @@ select.fctrl { cursor: pointer; }
     transform: scale(1);
   }
 
-  @media (max-width: 600px) {
-    .promo-grid { grid-template-columns: 1fr; }
-    .footer-banner-grid { grid-template-columns: 1fr; gap: 20px; }
-    .footer-main-content { grid-template-columns: 1fr; gap: 40px; }
-  }
+/* ✅ แก้ไข */
+@media (max-width: 600px) {
+  .promo-grid { grid-template-columns: 1fr; }
+
+  .footer-banner-grid { grid-template-columns: 1fr; gap: 20px; }
+  /* [FIX] ปรับ banner ใน 1 column ให้ไม่แน่นเกิน */
+  .footer-banner { flex-direction: column; }
+  .footer-banner-img { width: 100%; }
+
+  .footer-main-content { grid-template-columns: 1fr; gap: 40px; }
+
+  /* [FIX] add-section-body ควรอยู่ที่นี่ แต่ปัจจุบันอยู่ใน 600px block แยก */
+  .add-section-body { grid-template-columns: 1fr; }
+}
